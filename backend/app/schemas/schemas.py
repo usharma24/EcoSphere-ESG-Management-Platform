@@ -192,3 +192,58 @@ class RiskOut(RiskBase):
     class Config:
         from_attributes = True
 
+
+# ---------------------------------------------------------------------------
+# Carbon Emission Management Schemas
+# ---------------------------------------------------------------------------
+
+class CarbonCategoryBase(BaseModel):
+    name: str = Field(..., min_length=2, max_length=100)
+    unit: str = Field(..., min_length=1)
+    emission_factor: float = Field(..., gt=0, description="kg CO2 per unit")
+    description: Optional[str] = None
+    active: bool = True
+
+class CarbonCategoryCreate(CarbonCategoryBase):
+    pass
+
+class CarbonCategoryUpdate(BaseModel):
+    name: Optional[str] = None
+    unit: Optional[str] = None
+    emission_factor: Optional[float] = None
+    description: Optional[str] = None
+    active: Optional[bool] = None
+
+class CarbonCategoryOut(CarbonCategoryBase):
+    id: int
+    created_at: datetime
+
+    class Config:
+        from_attributes = True
+
+class CarbonRecordBase(BaseModel):
+    department_id: Optional[int] = None
+    employee_id: Optional[int] = None
+    category_id: int
+    quantity: float = Field(..., gt=0)
+    notes: Optional[str] = None
+    status: str = Field(default="Pending")
+
+class CarbonRecordCreate(CarbonRecordBase):
+    pass
+
+class CarbonRecordUpdate(BaseModel):
+    department_id: Optional[int] = None
+    employee_id: Optional[int] = None
+    category_id: Optional[int] = None
+    quantity: Optional[float] = None
+    notes: Optional[str] = None
+    status: Optional[str] = None
+
+class CarbonRecordOut(CarbonRecordBase):
+    id: int
+    co2_emitted: float
+    date: datetime
+
+    class Config:
+        from_attributes = True

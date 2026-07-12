@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import apiClient from "../api/client";
 import { useAuth } from "../context/AuthContext";
-import { Zap, Award, Crown, CheckCircle2, Plus, X } from "lucide-react";
+import { Zap, Award, Crown, CheckCircle2, Plus, X, Sparkles } from "lucide-react";
 
 interface Challenge {
   id: number;
@@ -44,9 +44,9 @@ interface UserBadge {
 }
 
 const DIFFICULTY_COLORS: Record<string, string> = {
-  Easy: "bg-[#E8F5E9] text-[#1B5E20]",
-  Medium: "bg-amber-50 text-amber-700",
-  Hard: "bg-red-50 text-red-600",
+  Easy: "bg-emerald-50 text-emerald-700 border border-emerald-100/50",
+  Medium: "bg-amber-50 text-amber-700 border border-amber-100/50",
+  Hard: "bg-rose-50 text-rose-700 border border-rose-100/50",
 };
 
 const emptyForm = { title: "", description: "", xp_reward: 50, category: "general", difficulty: "Easy" };
@@ -99,7 +99,7 @@ const Gamification: React.FC = () => {
     setMessage(null);
     try {
       await apiClient.post(`/api/gamification/challenges/${id}/join`);
-      setMessage("Joined the challenge!");
+      setMessage("Joined the challenge successfully!");
       load();
     } catch (err: any) {
       setError(err.response?.data?.detail || "Couldn't join this challenge.");
@@ -110,7 +110,7 @@ const Gamification: React.FC = () => {
     setMessage(null);
     try {
       const res = await apiClient.post(`/api/gamification/challenges/${id}/complete`);
-      setMessage(`Challenge completed! +${res.data.xp_earned} XP`);
+      setMessage(`Challenge completed successfully! +${res.data.xp_earned} XP`);
       load();
     } catch (err: any) {
       setError(err.response?.data?.detail || "Couldn't complete this challenge.");
@@ -136,194 +136,278 @@ const Gamification: React.FC = () => {
 
   if (loading) {
     return (
-      <div className="flex h-64 items-center justify-center">
-        <div className="h-8 w-8 animate-spin rounded-full border-4 border-[#2E7D32] border-t-transparent" />
+      <div className="space-y-6">
+        <div className="flex items-center justify-between">
+          <div className="shimmer-skeleton h-10 w-48 rounded-xl" />
+          <div className="shimmer-skeleton h-10 w-32 rounded-xl" />
+        </div>
+        <div className="shimmer-skeleton h-10 w-96 rounded-full" />
+        <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
+          {[...Array(6)].map((_, idx) => (
+            <div key={idx} className="shimmer-skeleton h-44 rounded-2xl w-full" />
+          ))}
+        </div>
       </div>
     );
   }
 
   return (
     <div className="space-y-6">
+      {/* Page Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-slate-800">Challenges & Rewards</h1>
-          <p className="text-sm text-slate-500">Earn XP, climb the leaderboard, and unlock badges. You have {user?.xp} XP.</p>
+          <h1 className="text-2xl font-extrabold text-slate-900 tracking-tight">Eco-Challenges & Achievements</h1>
+          <p className="text-sm font-medium text-slate-500 mt-1 flex items-center gap-1.5">
+            Earn experience points (XP) to climb ranks, unlock premium badges and claim carbon reward points.
+            <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-bold bg-emerald-50 border border-emerald-100/50 text-emerald-700 shadow-sm ml-2">
+              <Zap size={11} className="text-amber-500 fill-amber-500 animate-pulse" /> {user?.xp} XP Accumulated
+            </span>
+          </p>
         </div>
         {isAdmin && tab === "challenges" && (
           <button
             onClick={() => setShowModal(true)}
-            className="flex items-center gap-2 rounded-md bg-[#2E7D32] px-4 py-2 text-sm font-semibold text-white hover:bg-[#1B5E20] transition-colors"
+            className="inline-flex items-center gap-2 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 px-4 py-2.5 text-sm font-bold text-white hover:from-emerald-700 hover:to-teal-700 transition-all shadow-md shadow-emerald-500/10 cursor-pointer"
           >
             <Plus size={16} /> New Challenge
           </button>
         )}
       </div>
 
-      {error && <div className="rounded-md border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">{error}</div>}
-      {message && <div className="rounded-md border border-[#C8E6C9] bg-[#E8F5E9] px-4 py-3 text-sm text-[#1B5E20]">{message}</div>}
+      {error && (
+        <div className="rounded-xl border border-rose-200 bg-rose-50 px-4 py-3 text-sm text-rose-700 font-semibold shadow-sm">{error}</div>
+      )}
+      {message && (
+        <div className="rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-700 font-semibold shadow-sm">{message}</div>
+      )}
 
-      <div className="flex gap-2 border-b border-slate-100">
+      {/* Tabs list bar */}
+      <div className="flex border-b border-slate-200 gap-6 overflow-x-auto">
         {[
           { key: "challenges", label: "Challenges", icon: <Zap size={15} /> },
           { key: "leaderboard", label: "Leaderboard", icon: <Crown size={15} /> },
-          { key: "badges", label: "Badges", icon: <Award size={15} /> },
+          { key: "badges", label: "Badges Registry", icon: <Award size={15} /> },
         ].map((t) => (
           <button
             key={t.key}
             onClick={() => setTab(t.key as any)}
-            className={`flex items-center gap-1.5 border-b-2 px-4 py-2 text-sm font-semibold transition-colors ${
-              tab === t.key ? "border-[#2E7D32] text-[#2E7D32]" : "border-transparent text-slate-500 hover:text-slate-700"
+            className={`flex items-center gap-2 pb-4 text-xs font-bold uppercase tracking-wider border-b-2 transition-all duration-200 cursor-pointer ${
+              tab === t.key
+                ? "border-emerald-500 text-emerald-600"
+                : "border-transparent text-slate-400 hover:text-slate-800"
             }`}
           >
-            {t.icon} {t.label}
+            {t.icon}
+            <span>{t.label}</span>
           </button>
         ))}
       </div>
 
+      {/* Tab content view: Challenges */}
       {tab === "challenges" && (
-        <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
-          {challenges.length === 0 && (
-            <div className="col-span-full rounded-lg border border-dashed border-slate-200 py-12 text-center text-slate-400">
-              No challenges yet.
+        <div className="grid grid-cols-1 gap-5 md:grid-cols-2 lg:grid-cols-3">
+          {challenges.length === 0 ? (
+            <div className="col-span-full flex flex-col items-center justify-center py-16 text-center px-4 rounded-2xl border border-dashed border-slate-200">
+              <Zap className="h-12 w-12 text-slate-300 mb-3 animate-pulse" />
+              <p className="text-sm text-slate-400">No active challenges available at the moment.</p>
             </div>
-          )}
-          {challenges.map((c) => {
-            const mine = myChallengeMap.get(c.id);
-            return (
-              <div key={c.id} className="rounded-lg border border-slate-100 bg-white p-5 shadow-soft">
-                <div className="flex items-start justify-between">
-                  <span className={`rounded-full px-2.5 py-1 text-xs font-semibold ${DIFFICULTY_COLORS[c.difficulty] || "bg-slate-100 text-slate-600"}`}>
-                    {c.difficulty}
-                  </span>
-                  <span className="flex items-center gap-1 text-xs font-semibold text-amber-600">
-                    <Zap size={13} /> {c.xp_reward} XP
-                  </span>
-                </div>
-                <h3 className="mt-3 font-semibold text-slate-800">{c.title}</h3>
-                {c.description && <p className="mt-1 text-sm text-slate-500 line-clamp-2">{c.description}</p>}
-                <div className="mt-4">
-                  {!mine && (
-                    <button onClick={() => handleJoin(c.id)} className="w-full rounded-md bg-[#2E7D32] px-3 py-2 text-xs font-semibold text-white hover:bg-[#1B5E20]">
-                      Join Challenge
-                    </button>
-                  )}
-                  {mine && mine.status !== "Completed" && (
-                    <button onClick={() => handleComplete(c.id)} className="w-full rounded-md bg-amber-500 px-3 py-2 text-xs font-semibold text-white hover:bg-amber-600">
-                      Mark Complete
-                    </button>
-                  )}
-                  {mine && mine.status === "Completed" && (
-                    <div className="flex items-center justify-center gap-1.5 rounded-md bg-[#E8F5E9] px-3 py-2 text-xs font-semibold text-[#1B5E20]">
-                      <CheckCircle2 size={14} /> Completed
+          ) : (
+            challenges.map((c) => {
+              const mine = myChallengeMap.get(c.id);
+              return (
+                <div key={c.id} className="glass-card glass-card-hover p-6 rounded-2xl relative overflow-hidden flex flex-col justify-between">
+                  <div className="absolute top-0 left-0 w-full h-[3px] bg-gradient-to-r from-emerald-500 to-teal-500" />
+                  <div>
+                    <div className="flex items-start justify-between">
+                      <span className={`rounded-full px-2.5 py-0.5 text-[10px] font-bold ${DIFFICULTY_COLORS[c.difficulty] || "bg-slate-100 text-slate-600"}`}>
+                        {c.difficulty}
+                      </span>
+                      <span className="flex items-center gap-1.5 text-xs font-bold text-amber-600">
+                        <Zap size={14} className="fill-amber-500" /> {c.xp_reward} XP
+                      </span>
                     </div>
-                  )}
+                    
+                    <h3 className="mt-4 font-bold text-slate-800 text-base leading-snug">{c.title}</h3>
+                    {c.description && (
+                      <p className="mt-2 text-xs font-medium text-slate-400 line-clamp-2 leading-relaxed">{c.description}</p>
+                    )}
+                  </div>
+
+                  <div className="mt-6 pt-4 border-t border-slate-50">
+                    {!mine && (
+                      <button
+                        onClick={() => handleJoin(c.id)}
+                        className="w-full rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 py-2.5 text-xs font-bold text-white hover:from-emerald-700 hover:to-teal-700 transition-all cursor-pointer shadow-md shadow-emerald-500/10"
+                      >
+                        Join Challenge
+                      </button>
+                    )}
+                    {mine && mine.status !== "Completed" && (
+                      <button
+                        onClick={() => handleComplete(c.id)}
+                        className="w-full rounded-xl bg-gradient-to-r from-amber-500 to-orange-500 py-2.5 text-xs font-bold text-white hover:from-amber-600 hover:to-orange-600 transition-all cursor-pointer shadow-md shadow-amber-500/10"
+                      >
+                        Mark Complete
+                      </button>
+                    )}
+                    {mine && mine.status === "Completed" && (
+                      <div className="flex items-center justify-center gap-1.5 rounded-xl bg-emerald-50 border border-emerald-100/50 py-2.5 text-xs font-bold text-emerald-700">
+                        <CheckCircle2 size={15} /> Completed
+                      </div>
+                    )}
+                  </div>
                 </div>
-              </div>
-            );
-          })}
+              );
+            })
+          )}
         </div>
       )}
 
+      {/* Tab content view: Leaderboard */}
       {tab === "leaderboard" && (
-        <div className="overflow-hidden rounded-lg border border-slate-100 bg-white shadow-soft">
-          <table className="w-full text-left text-sm">
-            <thead className="bg-slate-50 text-xs uppercase text-slate-500">
-              <tr>
-                <th className="px-4 py-3">Rank</th>
-                <th className="px-4 py-3">Name</th>
-                <th className="px-4 py-3">Role</th>
-                <th className="px-4 py-3">XP</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-slate-100">
-              {leaderboard.map((entry) => (
-                <tr key={entry.id} className={entry.full_name === user?.full_name ? "bg-[#E8F5E9]" : "hover:bg-slate-50"}>
-                  <td className="px-4 py-3 font-semibold text-slate-700">
-                    {entry.rank <= 3 ? <Crown size={15} className="inline text-amber-500 mr-1" /> : null}#{entry.rank}
-                  </td>
-                  <td className="px-4 py-3 font-medium text-slate-700">{entry.full_name}</td>
-                  <td className="px-4 py-3 text-slate-500">{entry.role}</td>
-                  <td className="px-4 py-3 font-semibold text-[#2E7D32]">{entry.xp} XP</td>
+        <div className="bg-white rounded-2xl border border-slate-100 shadow-soft overflow-hidden">
+          <div className="px-6 py-4 border-b border-slate-50 bg-slate-50/50 flex items-center justify-between">
+            <h3 className="text-xs font-bold text-slate-400 uppercase tracking-wider">Company-wide ESG Leaderboard</h3>
+            <span className="text-[10px] font-bold text-emerald-600 bg-emerald-50 border border-emerald-100/50 px-2 py-0.5 rounded-full uppercase tracking-wider">
+              Updated hourly
+            </span>
+          </div>
+
+          <div className="overflow-x-auto">
+            <table className="w-full text-left text-sm">
+              <thead>
+                <tr className="border-b border-slate-100 text-[10px] font-bold uppercase tracking-wider text-slate-400">
+                  <th className="px-6 py-3.5">Rank</th>
+                  <th className="px-6 py-3.5">Name</th>
+                  <th className="px-6 py-3.5">Department Role</th>
+                  <th className="px-6 py-3.5 text-right">XP Earned</th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
+              </thead>
+              <tbody className="divide-y divide-slate-50">
+                {leaderboard.map((entry) => {
+                  const isMe = entry.full_name === user?.full_name;
+                  let rankDecorator = null;
+                  if (entry.rank === 1) rankDecorator = <Crown size={14} className="inline text-yellow-500 fill-yellow-500 mr-1 animate-bounce" />;
+                  else if (entry.rank === 2) rankDecorator = <Crown size={14} className="inline text-slate-400 fill-slate-300 mr-1" />;
+                  else if (entry.rank === 3) rankDecorator = <Crown size={14} className="inline text-amber-600 fill-amber-700 mr-1" />;
+
+                  return (
+                    <tr
+                      key={entry.id}
+                      className={`transition-colors ${
+                        isMe
+                          ? "bg-emerald-50/60 border-l-4 border-emerald-500 font-bold hover:bg-emerald-50"
+                          : "hover:bg-slate-50/80"
+                      }`}
+                    >
+                      <td className="px-6 py-4 text-sm font-semibold text-slate-700">
+                        {rankDecorator}
+                        <span>#{entry.rank}</span>
+                      </td>
+                      <td className="px-6 py-4 font-semibold text-slate-800">{entry.full_name}</td>
+                      <td className="px-6 py-4 text-slate-500 font-medium">{entry.role}</td>
+                      <td className="px-6 py-4 font-bold text-emerald-600 text-right">{entry.xp} XP</td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
         </div>
       )}
 
+      {/* Tab content view: Badges */}
       {tab === "badges" && (
         <div className="grid grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-4">
-          {badges.length === 0 && (
-            <div className="col-span-full rounded-lg border border-dashed border-slate-200 py-12 text-center text-slate-400">
-              No badges configured yet.
+          {badges.length === 0 ? (
+            <div className="col-span-full flex flex-col items-center justify-center py-16 text-center px-4 rounded-2xl border border-dashed border-slate-200">
+              <Award className="h-12 w-12 text-slate-300 mb-3" />
+              <p className="text-sm text-slate-400">No achievements configured yet.</p>
             </div>
+          ) : (
+            badges.map((b) => {
+              const earned = earnedBadgeIds.has(b.id);
+              return (
+                <div
+                  key={b.id}
+                  className={`glass-card p-6 text-center rounded-2xl relative overflow-hidden transition-all duration-300 hover:scale-[1.02] border ${
+                    earned
+                      ? "border-amber-300/40 bg-amber-50/40 ring-1 ring-amber-400/10 shadow-soft"
+                      : "opacity-60 border-slate-100 bg-white"
+                  }`}
+                >
+                  {earned && (
+                    <div className="absolute top-0 right-0 w-8 h-8 flex items-center justify-center rounded-bl-xl bg-gradient-to-tr from-amber-500 to-yellow-500 text-white font-bold text-[9px] shadow-sm">
+                      ✔
+                    </div>
+                  )}
+                  <div className="text-4xl filter drop-shadow-md select-none">{b.icon || "🏅"}</div>
+                  <h3 className="mt-3 font-bold text-slate-800 text-sm">{b.title}</h3>
+                  {b.description && <p className="mt-1 text-xs font-semibold text-slate-400 leading-snug line-clamp-2">{b.description}</p>}
+                  <p className="mt-4 text-[10px] font-bold uppercase tracking-wider text-slate-400">
+                    {earned ? "Unlocked" : `Required: ${b.rule_value} ${b.rule_metric}`}
+                  </p>
+                </div>
+              );
+            })
           )}
-          {badges.map((b) => {
-            const earned = earnedBadgeIds.has(b.id);
-            return (
-              <div
-                key={b.id}
-                className={`rounded-lg border p-5 text-center shadow-soft ${
-                  earned ? "border-amber-200 bg-amber-50" : "border-slate-100 bg-white opacity-60"
-                }`}
-              >
-                <div className="text-3xl">{b.icon || "🏅"}</div>
-                <h3 className="mt-2 text-sm font-semibold text-slate-800">{b.title}</h3>
-                {b.description && <p className="mt-1 text-xs text-slate-500">{b.description}</p>}
-                <p className="mt-2 text-[11px] font-medium text-slate-400">
-                  {earned ? "Unlocked" : `Needs ${b.rule_value} ${b.rule_metric}`}
-                </p>
-              </div>
-            );
-          })}
         </div>
       )}
 
+      {/* Modal Dialog */}
       {showModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/30 p-4">
-          <div className="w-full max-w-md rounded-lg bg-white p-6 shadow-soft">
-            <div className="mb-4 flex items-center justify-between">
-              <h3 className="text-lg font-semibold text-slate-800">New Challenge</h3>
-              <button onClick={() => setShowModal(false)} className="text-slate-400 hover:text-slate-600">
-                <X size={20} />
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/45 p-4 backdrop-blur-sm">
+          <div className="w-full max-w-md rounded-2xl bg-white p-6 shadow-lg border border-slate-100 relative overflow-hidden">
+            <div className="absolute top-0 left-0 w-full h-[4px] bg-gradient-to-r from-emerald-500 to-teal-500" />
+            <div className="mb-6 flex items-center justify-between">
+              <h3 className="text-lg font-bold text-slate-800 flex items-center gap-1.5">
+                <Sparkles size={16} className="text-emerald-500 animate-spin" /> Launch ESG Challenge
+              </h3>
+              <button
+                onClick={() => setShowModal(false)}
+                className="text-slate-400 hover:text-slate-600 p-1 hover:bg-slate-50 rounded-full transition-colors cursor-pointer"
+              >
+                <X size={18} />
               </button>
             </div>
             <form onSubmit={handleCreate} className="space-y-4">
               <div>
-                <label className="mb-1 block text-xs font-medium text-slate-600">Title</label>
+                <label className="mb-1.5 block text-xs font-bold uppercase tracking-wider text-slate-400">Challenge Title</label>
                 <input
                   required
                   value={form.title}
                   onChange={(e) => setForm({ ...form, title: e.target.value })}
-                  className="w-full rounded-md border border-slate-200 px-3 py-2 text-sm focus:border-[#2E7D32] focus:outline-none"
+                  placeholder="e.g. Bring your own reusable mug"
+                  className="w-full rounded-xl border border-slate-200 px-3.5 py-2.5 text-sm focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/10 focus:outline-none transition-all outline-none font-medium text-slate-800 placeholder-slate-400"
                 />
               </div>
               <div>
-                <label className="mb-1 block text-xs font-medium text-slate-600">Description</label>
+                <label className="mb-1.5 block text-xs font-bold uppercase tracking-wider text-slate-400">Description</label>
                 <textarea
                   value={form.description}
                   onChange={(e) => setForm({ ...form, description: e.target.value })}
                   rows={2}
-                  className="w-full rounded-md border border-slate-200 px-3 py-2 text-sm focus:border-[#2E7D32] focus:outline-none"
+                  placeholder="Goals and instructions for complete verification."
+                  className="w-full rounded-xl border border-slate-200 px-3.5 py-2.5 text-sm focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/10 focus:outline-none transition-all outline-none font-medium text-slate-800 placeholder-slate-400"
                 />
               </div>
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="mb-1 block text-xs font-medium text-slate-600">XP reward</label>
+                  <label className="mb-1.5 block text-xs font-bold uppercase tracking-wider text-slate-400">XP Reward</label>
                   <input
                     type="number"
                     min={1}
                     value={form.xp_reward}
                     onChange={(e) => setForm({ ...form, xp_reward: Number(e.target.value) })}
-                    className="w-full rounded-md border border-slate-200 px-3 py-2 text-sm focus:border-[#2E7D32] focus:outline-none"
+                    className="w-full rounded-xl border border-slate-200 px-3.5 py-2.5 text-sm focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/10 focus:outline-none transition-all outline-none font-medium text-slate-800"
                   />
                 </div>
                 <div>
-                  <label className="mb-1 block text-xs font-medium text-slate-600">Difficulty</label>
+                  <label className="mb-1.5 block text-xs font-bold uppercase tracking-wider text-slate-400">Difficulty</label>
                   <select
                     value={form.difficulty}
                     onChange={(e) => setForm({ ...form, difficulty: e.target.value })}
-                    className="w-full rounded-md border border-slate-200 px-3 py-2 text-sm focus:border-[#2E7D32] focus:outline-none"
+                    className="w-full rounded-xl border border-slate-200 px-3.5 py-2.5 text-sm focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/10 focus:outline-none transition-all outline-none font-medium bg-white"
                   >
                     {["Easy", "Medium", "Hard"].map((d) => <option key={d} value={d}>{d}</option>)}
                   </select>
@@ -332,7 +416,7 @@ const Gamification: React.FC = () => {
               <button
                 type="submit"
                 disabled={submitting}
-                className="w-full rounded-md bg-[#2E7D32] px-4 py-2 text-sm font-semibold text-white hover:bg-[#1B5E20] disabled:opacity-60 transition-colors"
+                className="w-full rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 py-3 text-sm font-bold text-white hover:from-emerald-700 hover:to-teal-700 disabled:opacity-60 transition-all cursor-pointer shadow-md shadow-emerald-500/10"
               >
                 {submitting ? "Saving..." : "Create Challenge"}
               </button>

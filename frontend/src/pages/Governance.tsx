@@ -4,7 +4,7 @@ import apiClient from "../api/client";
 import { 
   Shield, FileText, AlertTriangle, Calendar, Clipboard, 
   Plus, Check, AlertCircle, UserCheck, ShieldAlert,
-  ArrowRight, ShieldCheck, Activity
+  ArrowRight, ShieldCheck, Activity, Sparkles, X
 } from "lucide-react";
 
 interface Policy {
@@ -147,7 +147,6 @@ const Governance: React.FC = () => {
     setTimeout(() => setSuccessMessage(null), 4000);
   };
 
-  // Handlers
   const handleAcknowledgePolicy = async (policyId: number) => {
     try {
       await apiClient.post(`/api/governance/policies/${policyId}/acknowledge`);
@@ -291,17 +290,17 @@ const Governance: React.FC = () => {
   // Helper formatting logic
   const getRiskBadgeColor = (likelihood: number, impact: number) => {
     const score = likelihood * impact;
-    if (score >= 15) return "bg-red-50 text-red-700 border-red-200";
-    if (score >= 8) return "bg-amber-50 text-amber-700 border-amber-200";
-    return "bg-green-50 text-green-700 border-green-200";
+    if (score >= 15) return "bg-rose-50 text-rose-700 border-rose-200/50 font-bold";
+    if (score >= 8) return "bg-amber-50 text-amber-700 border-amber-200/50 font-semibold";
+    return "bg-emerald-50 text-emerald-700 border-emerald-200/50";
   };
 
   const getSeverityBadgeColor = (severity: string) => {
     switch (severity) {
-      case "Critical": return "bg-red-100 text-red-800 border-red-200";
-      case "High": return "bg-orange-50 text-orange-700 border-orange-200";
-      case "Medium": return "bg-amber-50 text-amber-700 border-amber-200";
-      default: return "bg-blue-50 text-blue-700 border-blue-200";
+      case "Critical": return "bg-rose-100 text-rose-800 border-rose-200/60 font-bold";
+      case "High": return "bg-orange-50 text-orange-700 border-orange-200/60 font-semibold";
+      case "Medium": return "bg-amber-50 text-amber-700 border-amber-200/60";
+      default: return "bg-blue-50 text-blue-700 border-blue-200/60";
     }
   };
 
@@ -311,23 +310,27 @@ const Governance: React.FC = () => {
       case "Closed":
       case "Mitigated":
       case "Completed":
-        return "bg-green-50 text-green-700 border-green-200";
+        return "bg-emerald-50 text-emerald-700 border-emerald-200/60 font-semibold";
       case "Under Review":
       case "In Progress":
       case "Monitoring":
-        return "bg-blue-50 text-blue-700 border-blue-200";
+        return "bg-sky-50 text-sky-700 border-sky-200/60 font-medium";
       default:
-        return "bg-slate-100 text-slate-700 border-slate-200";
+        return "bg-slate-100 text-slate-700 border-slate-200/60";
     }
   };
 
   if (loading) {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-[#F7F9FC]">
-        <div className="flex flex-col items-center gap-4">
-          <div className="h-10 w-10 animate-spin rounded-full border-4 border-[#2E7D32] border-t-transparent"></div>
-          <p className="text-sm font-medium text-slate-500">Loading Governance Module...</p>
+      <div className="space-y-6">
+        <div className="shimmer-skeleton h-24 rounded-2xl w-full" />
+        <div className="shimmer-skeleton h-10 w-96 rounded-full" />
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+          {[...Array(4)].map((_, idx) => (
+            <div key={idx} className="shimmer-skeleton h-28 rounded-2xl" />
+          ))}
         </div>
+        <div className="shimmer-skeleton h-80 rounded-2xl w-full" />
       </div>
     );
   }
@@ -339,17 +342,17 @@ const Governance: React.FC = () => {
   const upcomingAuditsCount = audits.filter(a => a.status === "Scheduled" || a.status === "In Progress").length;
 
   return (
-    <div className="min-h-screen bg-[#F7F9FC] pb-12">
-      {/* Upper Navigation and Header */}
-      <div className="bg-white border-b border-slate-100 py-6 px-8 shadow-sm">
-        <div className="mx-auto max-w-7xl flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+    <div className="space-y-6">
+      {/* Header Board */}
+      <div className="glass-card p-6 rounded-2xl border border-slate-100/50 shadow-soft bg-white/70">
+        <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
           <div>
-            <div className="flex items-center gap-2 text-[#2E7D32] font-semibold text-sm">
-              <Shield className="h-4 w-4" />
+            <div className="flex items-center gap-1.5 text-emerald-600 font-bold text-xs uppercase tracking-wider">
+              <Shield className="h-4 w-4 text-emerald-500" />
               <span>Governance & Compliance</span>
             </div>
-            <h1 className="text-2xl font-bold text-slate-800 mt-1">EcoSphere Corporate Governance</h1>
-            <p className="text-slate-500 text-sm">Policies, Risk registers, Scheduling audits, and tracking Compliance</p>
+            <h1 className="text-2xl font-extrabold text-slate-900 tracking-tight mt-1.5">EcoSphere Governance Panel</h1>
+            <p className="text-slate-500 text-sm mt-0.5">Control audits schedule, manage compliance reports, corporate policies and evaluated risk logs.</p>
           </div>
           
           {/* Quick Actions */}
@@ -358,310 +361,314 @@ const Governance: React.FC = () => {
               <>
                 <button
                   onClick={() => setShowCreatePolicy(true)}
-                  className="inline-flex items-center gap-1.5 rounded-md bg-[#2E7D32] px-3.5 py-2 text-sm font-semibold text-white hover:bg-[#1B5E20] transition-colors shadow-sm"
+                  className="inline-flex items-center gap-1.5 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 px-4 py-2 text-xs font-bold text-white hover:from-emerald-700 hover:to-teal-700 transition-all shadow-md shadow-emerald-500/10 cursor-pointer"
                 >
                   <Plus className="h-4 w-4" /> Publish Policy
                 </button>
                 <button
                   onClick={() => setShowCreateAudit(true)}
-                  className="inline-flex items-center gap-1.5 rounded-md border border-slate-200 bg-white px-3.5 py-2 text-sm font-semibold text-slate-600 hover:bg-slate-50 transition-colors shadow-sm"
+                  className="inline-flex items-center gap-1.5 rounded-xl border border-slate-200 bg-white px-4 py-2 text-xs font-bold text-slate-600 hover:bg-slate-50 transition-colors shadow-sm cursor-pointer"
                 >
-                  <Calendar className="h-4 w-4 text-[#43A047]" /> Schedule Audit
+                  <Calendar className="h-4 w-4 text-emerald-500" /> Schedule Audit
                 </button>
                 <button
                   onClick={() => setShowCreateRisk(true)}
-                  className="inline-flex items-center gap-1.5 rounded-md border border-slate-200 bg-white px-3.5 py-2 text-sm font-semibold text-slate-600 hover:bg-slate-50 transition-colors shadow-sm"
+                  className="inline-flex items-center gap-1.5 rounded-xl border border-slate-200 bg-white px-4 py-2 text-xs font-bold text-slate-600 hover:bg-slate-50 transition-colors shadow-sm cursor-pointer"
                 >
-                  <Activity className="h-4 w-4 text-orange-500" /> Register Risk
+                  <Activity className="h-4 w-4 text-orange-500 animate-pulse" /> Register Risk
                 </button>
               </>
             )}
             <button
               onClick={() => setShowReportIssue(true)}
-              className="inline-flex items-center gap-1.5 rounded-md bg-red-50 border border-red-200 px-3.5 py-2 text-sm font-semibold text-red-700 hover:bg-red-100 transition-colors shadow-sm"
+              className="inline-flex items-center gap-1.5 rounded-xl bg-rose-50 border border-rose-200 px-4 py-2 text-xs font-bold text-rose-700 hover:bg-rose-100 transition-colors shadow-sm cursor-pointer"
             >
-              <AlertTriangle className="h-4 w-4" /> Report Issue
+              <AlertTriangle className="h-4 w-4 animate-bounce" /> Report Issue
             </button>
           </div>
         </div>
       </div>
 
-      {/* Main Container */}
-      <div className="mx-auto max-w-7xl px-8 mt-8">
-        
-        {/* Error / Success Toast Notifications */}
-        {errorMessage && (
-          <div className="mb-6 flex items-center gap-3 rounded-md bg-red-50 p-4 text-sm text-red-700 border border-red-200 shadow-soft">
-            <AlertCircle className="h-5 w-5 shrink-0" />
-            <span className="font-medium">{errorMessage}</span>
-            <button onClick={() => setErrorMessage(null)} className="ml-auto font-semibold hover:underline">Dismiss</button>
-          </div>
-        )}
-        {successMessage && (
-          <div className="mb-6 flex items-center gap-3 rounded-md bg-green-50 p-4 text-sm text-green-800 border border-green-200 shadow-soft">
-            <ShieldCheck className="h-5 w-5 shrink-0 text-[#2E7D32]" />
-            <span className="font-medium">{successMessage}</span>
-            <button onClick={() => setSuccessMessage(null)} className="ml-auto font-semibold hover:underline">Dismiss</button>
-          </div>
-        )}
-
-        {/* Tab Selection */}
-        <div className="flex border-b border-slate-200 gap-6 mb-8 overflow-x-auto">
-          {[
-            { id: "overview", label: "Overview", icon: Shield },
-            { id: "policies", label: "Policies & Sign-off", icon: FileText, badge: pendingAcksCount > 0 ? pendingAcksCount : null },
-            { id: "compliance", label: "Compliance Cases", icon: AlertTriangle, badge: openIssuesCount > 0 ? openIssuesCount : null },
-            { id: "risks", label: "Risk Register", icon: Clipboard, badge: activeRisksCount > 0 ? activeRisksCount : null },
-            { id: "audits", label: "Audits", icon: Calendar, badge: upcomingAuditsCount > 0 ? upcomingAuditsCount : null }
-          ].map(tab => (
-            <button
-              key={tab.id}
-              onClick={() => setActiveTab(tab.id as any)}
-              className={`flex items-center gap-2 pb-4 text-sm font-semibold border-b-2 transition-all duration-200 ${
-                activeTab === tab.id
-                  ? "border-[#2E7D32] text-[#2E7D32]"
-                  : "border-transparent text-slate-500 hover:text-slate-800"
-              }`}
-            >
-              <tab.icon className="h-4 w-4" />
-              <span>{tab.label}</span>
-              {tab.badge !== null && (
-                <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded-full ${
-                  tab.id === "compliance" ? "bg-red-100 text-red-800" : "bg-[#2E7D32]/10 text-[#2E7D32]"
-                }`}>
-                  {tab.badge}
-                </span>
-              )}
-            </button>
-          ))}
+      {/* Error / Success Toast Notifications */}
+      {errorMessage && (
+        <div className="flex items-center gap-3 rounded-xl bg-rose-50 p-4 text-sm text-rose-700 border border-rose-200 shadow-sm">
+          <AlertCircle className="h-5 w-5 shrink-0 text-rose-500" />
+          <span className="font-semibold">{errorMessage}</span>
+          <button onClick={() => setErrorMessage(null)} className="ml-auto font-bold hover:underline">Dismiss</button>
         </div>
+      )}
+      {successMessage && (
+        <div className="flex items-center gap-3 rounded-xl bg-emerald-50 p-4 text-sm text-emerald-800 border border-emerald-200 shadow-sm">
+          <ShieldCheck className="h-5 w-5 shrink-0 text-emerald-500" />
+          <span className="font-semibold">{successMessage}</span>
+          <button onClick={() => setSuccessMessage(null)} className="ml-auto font-bold hover:underline">Dismiss</button>
+        </div>
+      )}
 
-        {/* TAB 1: OVERVIEW */}
-        {activeTab === "overview" && (
-          <div className="space-y-8">
-            {/* KPI Cards Grid */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-              {[
-                { title: "Pending Policies", value: pendingAcksCount, desc: "Awaiting your signature", icon: FileText, color: "text-[#2E7D32] bg-green-50" },
-                { title: "Active Governance Risks", value: activeRisksCount, desc: "Monitored threat points", icon: Clipboard, color: "text-orange-600 bg-orange-50" },
-                { title: "Unresolved Compliance Issues", value: openIssuesCount, desc: "Pending internal cases", icon: AlertTriangle, color: "text-red-600 bg-red-50" },
-                { title: "Upcoming Audits", value: upcomingAuditsCount, desc: "Scheduled inspections", icon: Calendar, color: "text-blue-600 bg-blue-50" }
-              ].map((kpi, idx) => (
-                <div key={idx} className="bg-white p-6 rounded-lg border border-slate-100 shadow-soft flex items-center justify-between">
-                  <div>
-                    <span className="text-slate-400 text-xs font-semibold uppercase tracking-wider">{kpi.title}</span>
-                    <h3 className="text-3xl font-extrabold text-slate-800 mt-1">{kpi.value}</h3>
-                    <p className="text-xs text-slate-500 mt-1.5">{kpi.desc}</p>
-                  </div>
-                  <div className={`p-4 rounded-md ${kpi.color}`}>
-                    <kpi.icon className="h-6 w-6" />
-                  </div>
-                </div>
-              ))}
-            </div>
+      {/* Tab Selection */}
+      <div className="flex border-b border-slate-200 gap-6 overflow-x-auto">
+        {[
+          { id: "overview", label: "Overview", icon: Shield },
+          { id: "policies", label: "Policies & Sign-off", icon: FileText, badge: pendingAcksCount > 0 ? pendingAcksCount : null },
+          { id: "compliance", label: "Compliance Cases", icon: AlertTriangle, badge: openIssuesCount > 0 ? openIssuesCount : null },
+          { id: "risks", label: "Risk Register", icon: Clipboard, badge: activeRisksCount > 0 ? activeRisksCount : null },
+          { id: "audits", label: "Audits", icon: Calendar, badge: upcomingAuditsCount > 0 ? upcomingAuditsCount : null }
+        ].map(tab => (
+          <button
+            key={tab.id}
+            onClick={() => setActiveTab(tab.id as any)}
+            className={`flex items-center gap-2 pb-4 text-xs font-bold uppercase tracking-wider border-b-2 transition-all duration-200 cursor-pointer ${
+              activeTab === tab.id
+                ? "border-emerald-500 text-emerald-600"
+                : "border-transparent text-slate-400 hover:text-slate-800"
+            }`}
+          >
+            <tab.icon className="h-4 w-4" />
+            <span>{tab.label}</span>
+            {tab.badge !== null && (
+              <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded-full ${
+                tab.id === "compliance" ? "bg-rose-100 text-rose-800" : "bg-emerald-100 text-emerald-800"
+              }`}>
+                {tab.badge}
+              </span>
+            )}
+          </button>
+        ))}
+      </div>
 
-            {/* Quick Overview Boards */}
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-              {/* Policies list preview */}
-              <div className="bg-white rounded-lg border border-slate-100 shadow-soft p-6">
-                <div className="flex justify-between items-center mb-6">
-                  <h3 className="text-lg font-bold text-slate-800 flex items-center gap-2">
-                    <FileText className="h-5 w-5 text-[#2E7D32]" /> Action Items: Policies
-                  </h3>
-                  <button onClick={() => setActiveTab("policies")} className="text-xs font-semibold text-[#2E7D32] hover:underline flex items-center gap-1">
-                    View all <ArrowRight className="h-3 w-3" />
-                  </button>
+      {/* TAB 1: OVERVIEW */}
+      {activeTab === "overview" && (
+        <div className="space-y-6">
+          {/* KPI Cards Grid */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+            {[
+              { title: "Pending Sign-offs", value: pendingAcksCount, desc: "Awaiting your signature", icon: FileText, color: "text-emerald-600 bg-emerald-50" },
+              { title: "Active Governance Risks", value: activeRisksCount, desc: "Monitored threat points", icon: Clipboard, color: "text-amber-600 bg-amber-50" },
+              { title: "Unresolved Issues", value: openIssuesCount, desc: "Pending internal cases", icon: AlertTriangle, color: "text-rose-600 bg-rose-50" },
+              { title: "Upcoming Audits", value: upcomingAuditsCount, desc: "Scheduled inspections", icon: Calendar, color: "text-sky-600 bg-sky-50" }
+            ].map((kpi, idx) => (
+              <div key={idx} className="glass-card glass-card-hover p-6 rounded-2xl relative overflow-hidden flex items-center justify-between">
+                <div className="absolute top-0 left-0 w-full h-[2.5px] bg-gradient-to-r from-emerald-500/30 to-teal-500/30" />
+                <div>
+                  <span className="text-xs font-bold text-slate-400 uppercase tracking-wider">{kpi.title}</span>
+                  <h3 className="text-3xl font-extrabold text-slate-900 mt-2">{kpi.value}</h3>
+                  <p className="text-[11px] font-medium text-slate-400 mt-1">{kpi.desc}</p>
                 </div>
-                <div className="space-y-4">
-                  {policies.slice(0, 3).map((policyUser) => (
-                    <div 
-                      key={policyUser.policy.id} 
-                      onClick={() => setShowPolicyModal(policyUser)}
-                      className="border border-slate-100 hover:border-[#2E7D32]/30 rounded-md p-4 bg-slate-50/50 hover:bg-white transition-all duration-200 cursor-pointer flex justify-between items-center"
-                    >
-                      <div>
-                        <h4 className="font-semibold text-sm text-slate-800">{policyUser.policy.title}</h4>
-                        <p className="text-xs text-slate-400 mt-1">Version {policyUser.policy.version} • Published {new Date(policyUser.policy.created_at).toLocaleDateString()}</p>
-                      </div>
-                      <div>
-                        {policyUser.acknowledged ? (
-                          <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-semibold bg-green-50 border border-green-200 text-green-700">
-                            <Check className="h-3 w-3" /> Signed
-                          </span>
-                        ) : (
-                          <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-semibold bg-[#2E7D32]/10 border border-[#2E7D32]/20 text-[#2E7D32]">
-                            Sign now
-                          </span>
-                        )}
-                      </div>
-                    </div>
-                  ))}
-                  {policies.length === 0 && (
-                    <p className="text-sm text-slate-400 text-center py-4">No policies published yet.</p>
-                  )}
+                <div className={`p-3 rounded-xl border border-slate-100/50 ${kpi.color}`}>
+                  <kpi.icon className="h-5 w-5" />
                 </div>
               </div>
-
-              {/* Audits preview */}
-              <div className="bg-white rounded-lg border border-slate-100 shadow-soft p-6">
-                <div className="flex justify-between items-center mb-6">
-                  <h3 className="text-lg font-bold text-slate-800 flex items-center gap-2">
-                    <Calendar className="h-5 w-5 text-blue-500" /> Audit Schedule
-                  </h3>
-                  <button onClick={() => setActiveTab("audits")} className="text-xs font-semibold text-[#2E7D32] hover:underline flex items-center gap-1">
-                    View all <ArrowRight className="h-3 w-3" />
-                  </button>
-                </div>
-                <div className="space-y-4">
-                  {audits.slice(0, 3).map((audit) => (
-                    <div key={audit.id} className="border border-slate-100 rounded-md p-4 bg-slate-50/50 flex justify-between items-start">
-                      <div>
-                        <span className="text-[10px] font-bold text-slate-400 uppercase">Scope: {audit.scope || "General"}</span>
-                        <h4 className="font-semibold text-sm text-slate-800 mt-0.5">{audit.title}</h4>
-                        <p className="text-xs text-slate-500 mt-1">Auditor: {audit.auditor_name}</p>
-                        <p className="text-[11px] text-[#2E7D32] font-medium mt-1">Scheduled: {new Date(audit.scheduled_date).toLocaleString()}</p>
-                      </div>
-                      <span className={`px-2 py-0.5 border rounded-full text-[10px] font-bold uppercase ${getStatusBadgeColor(audit.status)}`}>
-                        {audit.status}
-                      </span>
-                    </div>
-                  ))}
-                  {audits.length === 0 && (
-                    <p className="text-sm text-slate-400 text-center py-4">No audits scheduled.</p>
-                  )}
-                </div>
-              </div>
-            </div>
+            ))}
           </div>
-        )}
 
-        {/* TAB 2: POLICIES */}
-        {activeTab === "policies" && (
-          <div className="space-y-6">
-            <div className="flex items-center justify-between">
-              <h3 className="text-lg font-bold text-slate-800">Corporate Policies & Digital Sign-off</h3>
-              <span className="text-xs text-slate-500">Every policy requires employee acknowledgement to ensure compliance standards.</span>
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              {policies.map((pUser) => (
-                <div key={pUser.policy.id} className="bg-white rounded-lg border border-slate-100 shadow-soft p-6 flex flex-col justify-between hover:border-slate-200 transition-all duration-200">
-                  <div>
-                    <div className="flex items-start justify-between">
-                      <span className="px-2 py-0.5 bg-slate-100 rounded text-xs font-semibold text-slate-500">v{pUser.policy.version}</span>
-                      {pUser.acknowledged ? (
-                        <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-semibold bg-green-50 border border-green-200 text-green-700">
-                          <Check className="h-3.5 w-3.5" /> Acknowledged
+          {/* Quick Overview Boards */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            {/* Policies list preview */}
+            <div className="glass-card p-6 rounded-2xl border border-slate-100/50 shadow-soft bg-white/70">
+              <div className="flex justify-between items-center mb-6">
+                <h3 className="text-sm font-bold text-slate-800 uppercase tracking-wider flex items-center gap-2">
+                  <FileText className="h-5 w-5 text-emerald-500" /> Action Items: Policies
+                </h3>
+                <button
+                  onClick={() => setActiveTab("policies")}
+                  className="text-xs font-bold text-emerald-600 hover:text-emerald-700 flex items-center gap-1 cursor-pointer"
+                >
+                  View all <ArrowRight className="h-3 w-3" />
+                </button>
+              </div>
+              <div className="space-y-3">
+                {policies.slice(0, 3).map((policyUser) => (
+                  <div 
+                    key={policyUser.policy.id} 
+                    onClick={() => setShowPolicyModal(policyUser)}
+                    className="border border-slate-100 hover:border-emerald-500/30 rounded-xl p-4 bg-slate-50/50 hover:bg-white transition-all duration-200 cursor-pointer flex justify-between items-center"
+                  >
+                    <div>
+                      <h4 className="font-bold text-sm text-slate-800">{policyUser.policy.title}</h4>
+                      <p className="text-[11px] text-slate-400 mt-1">v{policyUser.policy.version} • Published {new Date(policyUser.policy.created_at).toLocaleDateString()}</p>
+                    </div>
+                    <div>
+                      {policyUser.acknowledged ? (
+                        <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-semibold bg-emerald-50 border border-emerald-200 text-emerald-700">
+                          <Check className="h-3 w-3" /> Signed
                         </span>
                       ) : (
-                        <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-semibold bg-red-50 border border-red-200 text-red-700">
-                          Pending Action
+                        <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-semibold bg-rose-50 border border-rose-200 text-rose-700">
+                          Sign now
                         </span>
                       )}
                     </div>
-                    <h4 className="text-base font-bold text-slate-800 mt-3">{pUser.policy.title}</h4>
-                    <p className="text-sm text-slate-500 mt-2 line-clamp-3 bg-slate-50 p-3 rounded">
-                      {pUser.policy.content}
-                    </p>
                   </div>
-                  <div className="mt-6 pt-4 border-t border-slate-100 flex items-center justify-between">
-                    <span className="text-xs text-slate-400">Published {new Date(pUser.policy.created_at).toLocaleDateString()}</span>
-                    <button
-                      onClick={() => setShowPolicyModal(pUser)}
-                      className="text-sm font-semibold text-[#2E7D32] hover:text-[#1B5E20] flex items-center gap-1"
-                    >
-                      {pUser.acknowledged ? "View Signed Policy" : "Read & Sign"} <ArrowRight className="h-4 w-4" />
-                    </button>
+                ))}
+                {policies.length === 0 && (
+                  <p className="text-sm text-slate-400 text-center py-6">No policies published yet.</p>
+                )}
+              </div>
+            </div>
+
+            {/* Audits preview */}
+            <div className="glass-card p-6 rounded-2xl border border-slate-100/50 shadow-soft bg-white/70">
+              <div className="flex justify-between items-center mb-6">
+                <h3 className="text-sm font-bold text-slate-800 uppercase tracking-wider flex items-center gap-2">
+                  <Calendar className="h-5 w-5 text-sky-500" /> Audit Schedule
+                </h3>
+                <button
+                  onClick={() => setActiveTab("audits")}
+                  className="text-xs font-bold text-emerald-600 hover:text-emerald-700 flex items-center gap-1 cursor-pointer"
+                >
+                  View all <ArrowRight className="h-3 w-3" />
+                </button>
+              </div>
+              <div className="space-y-3">
+                {audits.slice(0, 3).map((audit) => (
+                  <div key={audit.id} className="border border-slate-100 rounded-xl p-4 bg-slate-50/50 flex justify-between items-start">
+                    <div>
+                      <span className="text-[9px] font-bold text-slate-400 uppercase tracking-wider">Scope: {audit.scope || "General"}</span>
+                      <h4 className="font-bold text-sm text-slate-800 mt-0.5">{audit.title}</h4>
+                      <p className="text-[11px] text-slate-400 mt-1">Auditor: {audit.auditor_name}</p>
+                      <p className="text-[11px] text-emerald-600 font-bold mt-1">Scheduled: {new Date(audit.scheduled_date).toLocaleDateString()}</p>
+                    </div>
+                    <span className={`px-2 py-0.5 border rounded-full text-[9px] font-bold uppercase ${getStatusBadgeColor(audit.status)}`}>
+                      {audit.status}
+                    </span>
                   </div>
-                </div>
-              ))}
-              
-              {policies.length === 0 && (
-                <div className="col-span-2 bg-white rounded-lg border border-slate-100 p-12 text-center text-slate-400">
-                  <FileText className="h-12 w-12 mx-auto mb-3" />
-                  <p>No active policies published.</p>
-                </div>
-              )}
+                ))}
+                {audits.length === 0 && (
+                  <p className="text-sm text-slate-400 text-center py-6">No audits scheduled.</p>
+                )}
+              </div>
             </div>
           </div>
-        )}
+        </div>
+      )}
 
-        {/* TAB 3: COMPLIANCE CASES */}
-        {activeTab === "compliance" && (
-          <div className="space-y-6">
-            <div className="flex items-center justify-between">
-              <h3 className="text-lg font-bold text-slate-800">Compliance & Regulatory Incident Logs</h3>
-              <button
-                onClick={() => setShowReportIssue(true)}
-                className="inline-flex items-center gap-1.5 rounded-md bg-[#2E7D32] px-3.5 py-2 text-sm font-semibold text-white hover:bg-[#1B5E20] transition-colors"
-              >
-                <Plus className="h-4 w-4" /> Report New Case
-              </button>
-            </div>
+      {/* TAB 2: POLICIES */}
+      {activeTab === "policies" && (
+        <div className="space-y-6">
+          <div className="flex items-center justify-between">
+            <h3 className="text-sm font-bold text-slate-400 uppercase tracking-wider">Corporate Policies & Digital Sign-off</h3>
+            <span className="text-xs font-medium text-slate-500">Every policy requires employee acknowledgement for audit transparency.</span>
+          </div>
 
-            <div className="bg-white rounded-lg border border-slate-100 shadow-soft overflow-hidden">
-              <table className="min-w-full divide-y divide-slate-100 text-left">
-                <thead className="bg-slate-50">
-                  <tr>
-                    <th className="px-6 py-3.5 text-xs font-semibold text-slate-500 uppercase tracking-wider">Reported Case</th>
-                    <th className="px-6 py-3.5 text-xs font-semibold text-slate-500 uppercase tracking-wider">Severity</th>
-                    <th className="px-6 py-3.5 text-xs font-semibold text-slate-500 uppercase tracking-wider">Status</th>
-                    <th className="px-6 py-3.5 text-xs font-semibold text-slate-500 uppercase tracking-wider">Reporter</th>
-                    <th className="px-6 py-3.5 text-xs font-semibold text-slate-500 uppercase tracking-wider">Assignee</th>
-                    <th className="px-6 py-3.5 text-xs font-semibold text-slate-500 uppercase tracking-wider text-right">Actions</th>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {policies.map((pUser) => (
+              <div key={pUser.policy.id} className="glass-card p-6 rounded-2xl relative overflow-hidden flex flex-col justify-between hover:border-slate-200 transition-all duration-200">
+                <div className="absolute top-0 left-0 w-full h-[3px] bg-gradient-to-r from-emerald-500 to-teal-500" />
+                <div>
+                  <div className="flex items-start justify-between">
+                    <span className="px-2 py-0.5 bg-slate-100 rounded text-xs font-semibold text-slate-500">v{pUser.policy.version}</span>
+                    {pUser.acknowledged ? (
+                      <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-semibold bg-emerald-50 border border-emerald-200 text-emerald-700">
+                        <Check className="h-3.5 w-3.5" /> Acknowledged
+                      </span>
+                    ) : (
+                      <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-semibold bg-rose-50 border border-rose-200 text-rose-700 animate-pulse">
+                        Signature Needed
+                      </span>
+                    )}
+                  </div>
+                  <h4 className="text-base font-bold text-slate-800 mt-3">{pUser.policy.title}</h4>
+                  <p className="text-xs font-medium text-slate-400 mt-2 line-clamp-3 bg-slate-50 p-3 rounded-xl border border-slate-100">
+                    {pUser.policy.content}
+                  </p>
+                </div>
+                <div className="mt-6 pt-4 border-t border-slate-100 flex items-center justify-between">
+                  <span className="text-xs text-slate-400">Published {new Date(pUser.policy.created_at).toLocaleDateString()}</span>
+                  <button
+                    onClick={() => setShowPolicyModal(pUser)}
+                    className="text-xs font-bold text-emerald-600 hover:text-emerald-700 flex items-center gap-1 cursor-pointer uppercase tracking-wider"
+                  >
+                    {pUser.acknowledged ? "View Signed Policy" : "Read & Sign"} <ArrowRight className="h-4 w-4" />
+                  </button>
+                </div>
+              </div>
+            ))}
+            
+            {policies.length === 0 && (
+              <div className="col-span-2 flex flex-col items-center justify-center py-16 text-center px-4 rounded-2xl border border-dashed border-slate-200">
+                <FileText className="h-12 w-12 text-slate-300 mb-3" />
+                <p className="text-sm text-slate-400">No active policies published.</p>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+
+      {/* TAB 3: COMPLIANCE CASES */}
+      {activeTab === "compliance" && (
+        <div className="space-y-6">
+          <div className="flex items-center justify-between">
+            <h3 className="text-sm font-bold text-slate-400 uppercase tracking-wider">Compliance & Regulatory Incident Logs</h3>
+            <button
+              onClick={() => setShowReportIssue(true)}
+              className="inline-flex items-center gap-1.5 rounded-xl bg-rose-50 border border-rose-200 px-4 py-2.5 text-xs font-bold text-rose-700 hover:bg-rose-100 transition-all cursor-pointer"
+            >
+              <Plus className="h-4 w-4" /> Report New Case
+            </button>
+          </div>
+
+          <div className="bg-white rounded-2xl border border-slate-100 shadow-soft overflow-hidden">
+            <div className="overflow-x-auto">
+              <table className="min-w-full text-left text-sm">
+                <thead>
+                  <tr className="border-b border-slate-100 text-[10px] font-bold uppercase tracking-wider text-slate-400 bg-slate-50/50">
+                    <th className="px-6 py-3.5">Reported Case Details</th>
+                    <th className="px-6 py-3.5">Severity</th>
+                    <th className="px-6 py-3.5">Status</th>
+                    <th className="px-6 py-3.5">Reporter</th>
+                    <th className="px-6 py-3.5">Assignee</th>
+                    <th className="px-6 py-3.5 text-right">Actions</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-slate-100 bg-white">
+                <tbody className="divide-y divide-slate-50">
                   {complianceIssues.map((issue) => (
-                    <tr key={issue.id} className="hover:bg-slate-50/50">
+                    <tr key={issue.id} className="hover:bg-slate-50/80 transition-colors">
                       <td className="px-6 py-4">
                         <div>
-                          <h4 className="text-sm font-bold text-slate-800">{issue.title}</h4>
-                          <p className="text-xs text-slate-500 mt-1">{issue.description}</p>
-                          <p className="text-[10px] text-slate-400 mt-1">Date: {new Date(issue.created_at).toLocaleString()}</p>
+                          <h4 className="text-sm font-bold text-slate-800 leading-snug">{issue.title}</h4>
+                          <p className="text-xs text-slate-400 mt-1 max-w-sm line-clamp-2">{issue.description}</p>
+                          <p className="text-[10px] font-semibold text-slate-400 mt-1">Logged: {new Date(issue.created_at).toLocaleString()}</p>
                         </div>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
-                        <span className={`px-2.5 py-0.5 border text-xs font-semibold rounded-full ${getSeverityBadgeColor(issue.severity)}`}>
+                        <span className={`px-2.5 py-0.5 border text-[10px] font-bold rounded-full ${getSeverityBadgeColor(issue.severity)}`}>
                           {issue.severity}
                         </span>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
-                        <span className={`px-2.5 py-0.5 border text-[11px] font-bold uppercase rounded-full ${getStatusBadgeColor(issue.status)}`}>
+                        <span className={`px-2.5 py-0.5 border text-[9px] font-bold uppercase rounded-full ${getStatusBadgeColor(issue.status)}`}>
                           {issue.status}
                         </span>
                       </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-slate-500">
-                        {issue.reported_by_name || "Internal"}
+                      <td className="px-6 py-4 whitespace-nowrap text-xs font-semibold text-slate-500">
+                        {issue.reported_by_name || "System Automated"}
                       </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-slate-500">
+                      <td className="px-6 py-4 whitespace-nowrap text-xs font-semibold text-slate-500">
                         {issue.assigned_to_name ? (
-                          <span className="flex items-center gap-1.5 text-slate-700">
-                            <UserCheck className="h-4 w-4 text-[#2E7D32]" /> {issue.assigned_to_name}
+                          <span className="flex items-center gap-1.5 text-slate-700 bg-slate-50 border border-slate-100 px-2 py-0.5 rounded-full">
+                            <UserCheck className="h-3.5 w-3.5 text-emerald-500" /> {issue.assigned_to_name}
                           </span>
                         ) : (
                           <span className="text-slate-400 italic">Unassigned</span>
                         )}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-right text-xs">
-                        <div className="flex justify-end gap-2">
-                          {/* Assign to me option */}
+                        <div className="flex justify-end gap-2.5">
                           {!issue.assigned_to_id && (
                             <button
                               onClick={() => handleAssignIssueToMe(issue.id)}
-                              className="font-semibold text-[#2E7D32] hover:underline"
+                              className="font-bold text-emerald-600 hover:text-emerald-700 cursor-pointer"
                             >
                               Assign to me
                             </button>
                           )}
                           
-                          {/* Management state transition buttons */}
                           {(isAdminOrManager || isDeptManager) && (
                             <>
                               {issue.status === "Open" && (
                                 <button
                                   onClick={() => handleUpdateIssueStatus(issue.id, "Under Review")}
-                                  className="font-semibold text-blue-600 hover:underline"
+                                  className="font-bold text-sky-600 hover:text-sky-700 cursor-pointer"
                                 >
                                   Review
                                 </button>
@@ -669,7 +676,7 @@ const Governance: React.FC = () => {
                               {(issue.status === "Open" || issue.status === "Under Review") && (
                                 <button
                                   onClick={() => handleUpdateIssueStatus(issue.id, "Resolved")}
-                                  className="font-semibold text-green-600 hover:underline"
+                                  className="font-bold text-emerald-600 hover:text-emerald-700 cursor-pointer"
                                 >
                                   Resolve
                                 </button>
@@ -683,7 +690,7 @@ const Governance: React.FC = () => {
                   {complianceIssues.length === 0 && (
                     <tr>
                       <td colSpan={6} className="text-center py-12 text-slate-400">
-                        <ShieldAlert className="h-10 w-10 mx-auto mb-2 text-slate-300" />
+                        <ShieldAlert className="h-12 w-12 mx-auto mb-2 text-slate-300" />
                         <p className="text-sm">No compliance issues logged.</p>
                       </td>
                     </tr>
@@ -692,80 +699,82 @@ const Governance: React.FC = () => {
               </table>
             </div>
           </div>
-        )}
+        </div>
+      )}
 
-        {/* TAB 4: RISK REGISTER */}
-        {activeTab === "risks" && (
-          <div className="space-y-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <h3 className="text-lg font-bold text-slate-800">Governance & Climate Risk Register</h3>
-                <p className="text-sm text-slate-500">Evaluating likelihood and business impacts of compliance and operational items.</p>
-              </div>
-              {isAdminOrManager && (
-                <button
-                  onClick={() => setShowCreateRisk(true)}
-                  className="inline-flex items-center gap-1.5 rounded-md bg-[#2E7D32] px-3.5 py-2 text-sm font-semibold text-white hover:bg-[#1B5E20] transition-colors shadow-sm"
-                >
-                  <Plus className="h-4 w-4" /> Add Risk Item
-                </button>
-              )}
+      {/* TAB 4: RISK REGISTER */}
+      {activeTab === "risks" && (
+        <div className="space-y-6">
+          <div className="flex items-center justify-between">
+            <div>
+              <h3 className="text-sm font-bold text-slate-400 uppercase tracking-wider">Governance Risk Register</h3>
+              <p className="text-xs text-slate-500 mt-1">Evaluating likelihood and operational business impacts of operational items.</p>
             </div>
+            {isAdminOrManager && (
+              <button
+                onClick={() => setShowCreateRisk(true)}
+                className="inline-flex items-center gap-1.5 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 px-4 py-2.5 text-xs font-bold text-white hover:from-emerald-700 hover:to-teal-700 transition-all shadow-md shadow-emerald-500/10 cursor-pointer"
+              >
+                <Plus className="h-4 w-4" /> Add Risk Item
+              </button>
+            )}
+          </div>
 
-            <div className="bg-white rounded-lg border border-slate-100 shadow-soft overflow-hidden">
-              <table className="min-w-full divide-y divide-slate-100 text-left">
-                <thead className="bg-slate-50">
-                  <tr>
-                    <th className="px-6 py-3.5 text-xs font-semibold text-slate-500 uppercase tracking-wider">Risk Threat Details</th>
-                    <th className="px-6 py-3.5 text-xs font-semibold text-slate-500 uppercase tracking-wider">Likelihood (1-5)</th>
-                    <th className="px-6 py-3.5 text-xs font-semibold text-slate-500 uppercase tracking-wider">Impact (1-5)</th>
-                    <th className="px-6 py-3.5 text-xs font-semibold text-slate-500 uppercase tracking-wider">Risk Score</th>
-                    <th className="px-6 py-3.5 text-xs font-semibold text-slate-500 uppercase tracking-wider">Mitigation Plan</th>
-                    <th className="px-6 py-3.5 text-xs font-semibold text-slate-500 uppercase tracking-wider">Status</th>
-                    {isAdminOrManager && <th className="px-6 py-3.5 text-xs font-semibold text-slate-500 uppercase tracking-wider text-right">Actions</th>}
+          <div className="bg-white rounded-2xl border border-slate-100 shadow-soft overflow-hidden">
+            <div className="overflow-x-auto">
+              <table className="min-w-full text-left text-sm">
+                <thead>
+                  <tr className="border-b border-slate-100 text-[10px] font-bold uppercase tracking-wider text-slate-400 bg-slate-50/50">
+                    <th className="px-6 py-3.5">Risk Threat Details</th>
+                    <th className="px-6 py-3.5">Likelihood (1-5)</th>
+                    <th className="px-6 py-3.5">Impact (1-5)</th>
+                    <th className="px-6 py-3.5">Risk Score</th>
+                    <th className="px-6 py-3.5">Mitigation Plan</th>
+                    <th className="px-6 py-3.5">Status</th>
+                    {isAdminOrManager && <th className="px-6 py-3.5 text-right">Actions</th>}
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-slate-100 bg-white">
+                <tbody className="divide-y divide-slate-50">
                   {risks.map((risk) => {
                     const score = risk.likelihood * risk.impact;
                     let threatLabel = "Low";
-                    if (score >= 15) threatLabel = "High / Critical";
+                    if (score >= 15) threatLabel = "Critical";
                     else if (score >= 8) threatLabel = "Medium";
 
                     return (
-                      <tr key={risk.id} className="hover:bg-slate-50/50">
+                      <tr key={risk.id} className="hover:bg-slate-50/80 transition-colors">
                         <td className="px-6 py-4">
                           <div>
-                            <h4 className="text-sm font-bold text-slate-800">{risk.title}</h4>
-                            <p className="text-xs text-slate-500 mt-1">{risk.description || "No description provided."}</p>
+                            <h4 className="text-sm font-bold text-slate-800 leading-snug">{risk.title}</h4>
+                            <p className="text-xs text-slate-400 mt-1 max-w-xs">{risk.description || "No description provided."}</p>
                           </div>
                         </td>
-                        <td className="px-6 py-4 text-center whitespace-nowrap text-sm text-slate-700">
+                        <td className="px-6 py-4 text-center font-bold text-slate-700">
                           {risk.likelihood}
                         </td>
-                        <td className="px-6 py-4 text-center whitespace-nowrap text-sm text-slate-700">
+                        <td className="px-6 py-4 text-center font-bold text-slate-700">
                           {risk.impact}
                         </td>
-                        <td className="px-6 py-4 whitespace-nowrap">
-                          <span className={`px-2.5 py-0.5 border text-xs font-semibold rounded-full ${getRiskBadgeColor(risk.likelihood, risk.impact)}`}>
+                        <td className="px-6 py-4">
+                          <span className={`px-2.5 py-0.5 border text-[10px] font-bold rounded-full ${getRiskBadgeColor(risk.likelihood, risk.impact)}`}>
                             {score} - {threatLabel}
                           </span>
                         </td>
                         <td className="px-6 py-4">
-                          <p className="text-xs text-slate-600 italic bg-slate-50/50 p-2.5 border border-slate-100 rounded-md max-w-xs">{risk.mitigation_strategy || "No mitigation mapped."}</p>
+                          <p className="text-xs text-slate-500 italic bg-slate-50/80 p-2.5 border border-slate-100 rounded-xl max-w-xs leading-relaxed">{risk.mitigation_strategy || "No mitigation mapped."}</p>
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap">
-                          <span className={`px-2.5 py-0.5 border text-[10px] font-bold uppercase rounded-full ${getStatusBadgeColor(risk.status)}`}>
+                          <span className={`px-2.5 py-0.5 border text-[9px] font-bold uppercase rounded-full ${getStatusBadgeColor(risk.status)}`}>
                             {risk.status}
                           </span>
                         </td>
                         {isAdminOrManager && (
                           <td className="px-6 py-4 whitespace-nowrap text-right text-xs">
-                            <div className="flex justify-end gap-2">
+                            <div className="flex justify-end gap-2.5">
                               {risk.status !== "Mitigated" && (
                                 <button
                                   onClick={() => handleUpdateRiskStatus(risk.id, "Mitigated")}
-                                  className="font-semibold text-green-600 hover:underline"
+                                  className="font-bold text-emerald-600 hover:text-emerald-700 cursor-pointer"
                                 >
                                   Mitigate
                                 </button>
@@ -773,7 +782,7 @@ const Governance: React.FC = () => {
                               {risk.status === "Identified" && (
                                 <button
                                   onClick={() => handleUpdateRiskStatus(risk.id, "Monitoring")}
-                                  className="font-semibold text-blue-600 hover:underline"
+                                  className="font-bold text-sky-600 hover:text-sky-700 cursor-pointer"
                                 >
                                   Monitor
                                 </button>
@@ -787,7 +796,7 @@ const Governance: React.FC = () => {
                   {risks.length === 0 && (
                     <tr>
                       <td colSpan={7} className="text-center py-12 text-slate-400">
-                        <Shield className="h-10 w-10 mx-auto mb-2 text-slate-300" />
+                        <Shield className="h-12 w-12 mx-auto mb-2 text-slate-300" />
                         <p className="text-sm">No risk items registered.</p>
                       </td>
                     </tr>
@@ -796,91 +805,92 @@ const Governance: React.FC = () => {
               </table>
             </div>
           </div>
-        )}
+        </div>
+      )}
 
-        {/* TAB 5: AUDITS */}
-        {activeTab === "audits" && (
-          <div className="space-y-6">
-            <div className="flex items-center justify-between">
-              <h3 className="text-lg font-bold text-slate-800">Governance & Policy Audits Schedule</h3>
-              <p className="text-sm text-slate-500">Systematic independent verification tracks.</p>
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              {audits.map((audit) => (
-                <div key={audit.id} className="bg-white rounded-lg border border-slate-100 shadow-soft p-6 flex flex-col justify-between">
-                  <div>
-                    <div className="flex items-center justify-between">
-                      <span className="text-xs font-semibold text-slate-400 uppercase bg-slate-50 px-2 py-0.5 rounded">Scope: {audit.scope || "General"}</span>
-                      <span className={`px-2 py-0.5 border rounded-full text-[10px] font-bold uppercase ${getStatusBadgeColor(audit.status)}`}>
-                        {audit.status}
-                      </span>
-                    </div>
-                    <h4 className="text-base font-bold text-slate-800 mt-3">{audit.title}</h4>
-                    <p className="text-sm text-slate-500 mt-2 bg-slate-50/50 p-3 rounded border border-slate-100">
-                      {audit.description || "No audit details supplied."}
-                    </p>
-                  </div>
-                  
-                  <div className="mt-6 pt-4 border-t border-slate-100 grid grid-cols-2 gap-4 text-xs text-slate-500">
-                    <div>
-                      <span className="block text-slate-400">Auditor Contact</span>
-                      <span className="font-semibold text-slate-700">{audit.auditor_name}</span>
-                    </div>
-                    <div>
-                      <span className="block text-slate-400">Scheduled Date</span>
-                      <span className="font-semibold text-[#2E7D32]">{new Date(audit.scheduled_date).toLocaleString()}</span>
-                    </div>
-                  </div>
-                </div>
-              ))}
-              
-              {audits.length === 0 && (
-                <div className="col-span-2 bg-white rounded-lg border border-slate-100 p-12 text-center text-slate-400">
-                  <Calendar className="h-12 w-12 mx-auto mb-3" />
-                  <p>No compliance audits scheduled.</p>
-                </div>
-              )}
-            </div>
+      {/* TAB 5: AUDITS */}
+      {activeTab === "audits" && (
+        <div className="space-y-6">
+          <div className="flex items-center justify-between">
+            <h3 className="text-sm font-bold text-slate-400 uppercase tracking-wider">Governance & Policy Audits Schedule</h3>
+            <p className="text-xs text-slate-500">Systematic verification tracks mapped across corporate branches.</p>
           </div>
-        )}
 
-      </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {audits.map((audit) => (
+              <div key={audit.id} className="glass-card p-6 rounded-2xl relative overflow-hidden flex flex-col justify-between">
+                <div className="absolute top-0 left-0 w-full h-[3px] bg-gradient-to-r from-emerald-500 to-teal-500" />
+                <div>
+                  <div className="flex items-center justify-between">
+                    <span className="text-[10px] font-bold text-slate-400 uppercase bg-slate-50 px-2 py-0.5 rounded border border-slate-100/50">Scope: {audit.scope || "General"}</span>
+                    <span className={`px-2 py-0.5 border rounded-full text-[9px] font-bold uppercase ${getStatusBadgeColor(audit.status)}`}>
+                      {audit.status}
+                    </span>
+                  </div>
+                  <h4 className="text-base font-bold text-slate-800 mt-3">{audit.title}</h4>
+                  <p className="text-xs font-medium text-slate-400 mt-2 bg-slate-50/50 p-3 rounded-xl border border-slate-100/50">
+                    {audit.description || "No audit details supplied."}
+                  </p>
+                </div>
+                
+                <div className="mt-6 pt-4 border-t border-slate-100 grid grid-cols-2 gap-4 text-xs text-slate-500">
+                  <div>
+                    <span className="block text-slate-400 font-bold uppercase text-[9px] tracking-wider">Auditor Contact</span>
+                    <span className="font-semibold text-slate-700">{audit.auditor_name}</span>
+                  </div>
+                  <div>
+                    <span className="block text-slate-400 font-bold uppercase text-[9px] tracking-wider">Scheduled Date</span>
+                    <span className="font-bold text-emerald-600">{new Date(audit.scheduled_date).toLocaleString()}</span>
+                  </div>
+                </div>
+              </div>
+            ))}
+            
+            {audits.length === 0 && (
+              <div className="col-span-2 flex flex-col items-center justify-center py-16 text-center px-4 rounded-2xl border border-dashed border-slate-200">
+                <Calendar className="h-12 w-12 text-slate-300 mb-3" />
+                <p className="text-sm text-slate-400">No compliance audits scheduled.</p>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
 
       {/* POLICY DIGITAL ACKNOWLEDGEMENT MODAL */}
       {showPolicyModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/40 p-4 backdrop-blur-xs">
-          <div className="w-full max-w-2xl bg-white rounded-lg shadow-soft border border-slate-200 p-8 max-h-[85vh] overflow-y-auto">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/45 p-4 backdrop-blur-sm">
+          <div className="w-full max-w-2xl bg-white rounded-2xl shadow-lg border border-slate-100 p-8 max-h-[85vh] overflow-y-auto relative">
+            <div className="absolute top-0 left-0 w-full h-[4px] bg-gradient-to-r from-emerald-500 to-teal-500" />
             <h3 className="text-xl font-bold text-slate-800">{showPolicyModal.policy.title}</h3>
-            <div className="flex gap-4 text-xs text-slate-400 mt-2 border-b border-slate-100 pb-3">
+            <div className="flex gap-4 text-xs font-semibold text-slate-400 mt-2 border-b border-slate-50 pb-3">
               <span>Version {showPolicyModal.policy.version}</span>
               <span>Published {new Date(showPolicyModal.policy.created_at).toLocaleDateString()}</span>
             </div>
             
-            <div className="mt-6 text-sm text-slate-700 bg-slate-50/50 border border-slate-100 p-6 rounded-md whitespace-pre-wrap leading-relaxed">
+            <div className="mt-6 text-xs font-medium text-slate-600 bg-slate-50/80 border border-slate-100 p-6 rounded-xl whitespace-pre-wrap leading-relaxed">
               {showPolicyModal.policy.content}
             </div>
 
             {showPolicyModal.acknowledged ? (
-              <div className="mt-8 flex items-center gap-3 bg-green-50 text-green-700 border border-green-200 p-4 rounded-md text-sm">
-                <ShieldCheck className="h-6 w-6 text-[#2E7D32] shrink-0" />
+              <div className="mt-8 flex items-center gap-3 bg-emerald-50 text-emerald-700 border border-emerald-100 p-4 rounded-xl text-sm">
+                <ShieldCheck className="h-6 w-6 text-emerald-600 shrink-0" />
                 <div>
-                  <p className="font-semibold">You acknowledged this policy digitally.</p>
-                  <p className="text-xs text-green-600 mt-0.5">Signed at: {new Date(showPolicyModal.acknowledged_at!).toLocaleString()}</p>
+                  <p className="font-bold">You acknowledged this policy digitally.</p>
+                  <p className="text-xs text-emerald-600 mt-0.5 font-medium">Signed at: {new Date(showPolicyModal.acknowledged_at!).toLocaleString()}</p>
                 </div>
-                <button onClick={() => setShowPolicyModal(null)} className="ml-auto font-semibold hover:underline">Close</button>
+                <button onClick={() => setShowPolicyModal(null)} className="ml-auto font-bold hover:underline cursor-pointer">Close</button>
               </div>
             ) : (
               <div className="mt-8 pt-6 border-t border-slate-100 flex justify-end gap-3">
                 <button
                   onClick={() => setShowPolicyModal(null)}
-                  className="rounded-md border border-slate-200 px-4 py-2.5 text-sm font-semibold text-slate-500 hover:bg-slate-50 transition-colors"
+                  className="rounded-xl border border-slate-200 px-4 py-2.5 text-xs font-bold text-slate-500 hover:bg-slate-50 transition-colors cursor-pointer"
                 >
                   Close
                 </button>
                 <button
                   onClick={() => handleAcknowledgePolicy(showPolicyModal.policy.id)}
-                  className="rounded-md bg-[#2E7D32] px-5 py-2.5 text-sm font-semibold text-white hover:bg-[#1B5E20] transition-colors"
+                  className="rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 px-5 py-2.5 text-xs font-bold text-white hover:from-emerald-700 hover:to-teal-700 transition-all cursor-pointer shadow-md shadow-emerald-500/10"
                 >
                   Digitally Acknowledge & Sign
                 </button>
@@ -892,60 +902,60 @@ const Governance: React.FC = () => {
 
       {/* CREATE POLICY DIALOG */}
       {showCreatePolicy && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/40 p-4 backdrop-blur-xs">
-          <div className="w-full max-w-lg bg-white rounded-lg shadow-soft border border-slate-200 p-8">
-            <h3 className="text-lg font-bold text-slate-800 mb-4">Publish Corporate Policy</h3>
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/45 p-4 backdrop-blur-sm">
+          <div className="w-full max-w-lg bg-white rounded-2xl shadow-lg border border-slate-100 p-6 relative">
+            <div className="absolute top-0 left-0 w-full h-[4px] bg-gradient-to-r from-emerald-500 to-teal-500" />
+            <div className="mb-6 flex items-center justify-between">
+              <h3 className="text-lg font-bold text-slate-800 flex items-center gap-1.5">
+                <Sparkles size={16} className="text-emerald-500" /> Publish Corporate Policy
+              </h3>
+              <button
+                onClick={() => setShowCreatePolicy(false)}
+                className="text-slate-400 hover:text-slate-600 p-1 hover:bg-slate-50 rounded-full transition-colors cursor-pointer"
+              >
+                <X size={18} />
+              </button>
+            </div>
             <form onSubmit={handleCreatePolicy} className="space-y-4">
               <div>
-                <label className="block text-sm font-medium text-slate-600">Policy Title</label>
+                <label className="mb-1.5 block text-xs font-bold uppercase tracking-wider text-slate-400">Policy Title</label>
                 <input
                   type="text"
                   required
                   value={newPolicyTitle}
                   onChange={(e) => setNewPolicyTitle(e.target.value)}
                   placeholder="e.g. Carbon Neutral Workplace Policy"
-                  className="block w-full rounded-md border border-slate-200 bg-slate-50 mt-1 py-2.5 px-3 text-sm text-slate-800 focus:outline-[#2E7D32]"
+                  className="w-full rounded-xl border border-slate-200 px-3.5 py-2.5 text-sm focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/10 focus:outline-none transition-all outline-none font-medium text-slate-800 placeholder-slate-400"
                 />
               </div>
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-sm font-medium text-slate-600">Version</label>
-                  <input
-                    type="text"
-                    required
-                    value={newPolicyVersion}
-                    onChange={(e) => setNewPolicyVersion(e.target.value)}
-                    placeholder="1.0"
-                    className="block w-full rounded-md border border-slate-200 bg-slate-50 mt-1 py-2.5 px-3 text-sm text-slate-800 focus:outline-[#2E7D32]"
-                  />
-                </div>
+              <div>
+                <label className="mb-1.5 block text-xs font-bold uppercase tracking-wider text-slate-400">Version</label>
+                <input
+                  type="text"
+                  required
+                  value={newPolicyVersion}
+                  onChange={(e) => setNewPolicyVersion(e.target.value)}
+                  placeholder="1.0"
+                  className="w-full rounded-xl border border-slate-200 px-3.5 py-2.5 text-sm focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/10 focus:outline-none transition-all outline-none font-medium text-slate-800"
+                />
               </div>
               <div>
-                <label className="block text-sm font-medium text-slate-600">Policy Content</label>
+                <label className="mb-1.5 block text-xs font-bold uppercase tracking-wider text-slate-400">Policy Content</label>
                 <textarea
-                  rows={6}
+                  rows={5}
                   required
                   value={newPolicyContent}
                   onChange={(e) => setNewPolicyContent(e.target.value)}
                   placeholder="Insert the text of the policy here..."
-                  className="block w-full rounded-md border border-slate-200 bg-slate-50 mt-1 py-2.5 px-3 text-sm text-slate-800 focus:outline-[#2E7D32]"
+                  className="w-full rounded-xl border border-slate-200 px-3.5 py-2.5 text-sm focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/10 focus:outline-none transition-all outline-none font-medium text-slate-800 placeholder-slate-400"
                 />
               </div>
-              <div className="pt-4 border-t border-slate-100 flex justify-end gap-3">
-                <button
-                  type="button"
-                  onClick={() => setShowCreatePolicy(false)}
-                  className="rounded-md border border-slate-200 px-4 py-2.5 text-sm font-semibold text-slate-500 hover:bg-slate-50"
-                >
-                  Cancel
-                </button>
-                <button
-                  type="submit"
-                  className="rounded-md bg-[#2E7D32] px-5 py-2.5 text-sm font-semibold text-white hover:bg-[#1B5E20]"
-                >
-                  Publish Policy
-                </button>
-              </div>
+              <button
+                type="submit"
+                className="w-full rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 py-3 text-sm font-bold text-white hover:from-emerald-700 hover:to-teal-700 transition-all cursor-pointer shadow-md shadow-emerald-500/10"
+              >
+                Publish Policy
+              </button>
             </form>
           </div>
         </div>
@@ -953,79 +963,81 @@ const Governance: React.FC = () => {
 
       {/* SCHEDULE AUDIT DIALOG */}
       {showCreateAudit && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/40 p-4 backdrop-blur-xs">
-          <div className="w-full max-w-lg bg-white rounded-lg shadow-soft border border-slate-200 p-8">
-            <h3 className="text-lg font-bold text-slate-800 mb-4">Schedule Internal Audit</h3>
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/45 p-4 backdrop-blur-sm">
+          <div className="w-full max-w-lg bg-white rounded-2xl shadow-lg border border-slate-100 p-6 relative">
+            <div className="absolute top-0 left-0 w-full h-[4px] bg-gradient-to-r from-emerald-500 to-teal-500" />
+            <div className="mb-6 flex items-center justify-between">
+              <h3 className="text-lg font-bold text-slate-800 flex items-center gap-1.5">
+                <Sparkles size={16} className="text-emerald-500" /> Schedule Internal Audit
+              </h3>
+              <button
+                onClick={() => setShowCreateAudit(false)}
+                className="text-slate-400 hover:text-slate-600 p-1 hover:bg-slate-50 rounded-full transition-colors cursor-pointer"
+              >
+                <X size={18} />
+              </button>
+            </div>
             <form onSubmit={handleCreateAudit} className="space-y-4">
               <div>
-                <label className="block text-sm font-medium text-slate-600">Audit Title</label>
+                <label className="mb-1.5 block text-xs font-bold uppercase tracking-wider text-slate-400">Audit Title</label>
                 <input
                   type="text"
                   required
                   value={newAuditTitle}
                   onChange={(e) => setNewAuditTitle(e.target.value)}
                   placeholder="e.g. Q3 Energy Efficiency Audit"
-                  className="block w-full rounded-md border border-slate-200 bg-slate-50 mt-1 py-2.5 px-3 text-sm text-slate-800 focus:outline-[#2E7D32]"
+                  className="w-full rounded-xl border border-slate-200 px-3.5 py-2.5 text-sm focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/10 focus:outline-none transition-all outline-none font-medium text-slate-800 placeholder-slate-400"
                 />
               </div>
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-sm font-medium text-slate-600">Auditor Name</label>
+                  <label className="mb-1.5 block text-xs font-bold uppercase tracking-wider text-slate-400">Auditor Name</label>
                   <input
                     type="text"
                     required
                     value={newAuditAuditor}
                     onChange={(e) => setNewAuditAuditor(e.target.value)}
                     placeholder="John Doe"
-                    className="block w-full rounded-md border border-slate-200 bg-slate-50 mt-1 py-2.5 px-3 text-sm text-slate-800 focus:outline-[#2E7D32]"
+                    className="w-full rounded-xl border border-slate-200 px-3.5 py-2.5 text-sm focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/10 focus:outline-none transition-all outline-none font-medium text-slate-800 placeholder-slate-400"
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-slate-600">Audit Date & Time</label>
+                  <label className="mb-1.5 block text-xs font-bold uppercase tracking-wider text-slate-400">Date & Time</label>
                   <input
                     type="datetime-local"
                     required
                     value={newAuditDate}
                     onChange={(e) => setNewAuditDate(e.target.value)}
-                    className="block w-full rounded-md border border-slate-200 bg-slate-50 mt-1 py-2.5 px-3 text-sm text-slate-800 focus:outline-[#2E7D32]"
+                    className="w-full rounded-xl border border-slate-200 px-3.5 py-2.5 text-sm focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/10 focus:outline-none transition-all outline-none font-medium text-slate-850"
                   />
                 </div>
               </div>
               <div>
-                <label className="block text-sm font-medium text-slate-600">Scope</label>
+                <label className="mb-1.5 block text-xs font-bold uppercase tracking-wider text-slate-400">Scope</label>
                 <input
                   type="text"
                   value={newAuditScope}
                   onChange={(e) => setNewAuditScope(e.target.value)}
                   placeholder="e.g. IT Department Infrastructure"
-                  className="block w-full rounded-md border border-slate-200 bg-slate-50 mt-1 py-2.5 px-3 text-sm text-slate-800 focus:outline-[#2E7D32]"
+                  className="w-full rounded-xl border border-slate-200 px-3.5 py-2.5 text-sm focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/10 focus:outline-none transition-all outline-none font-medium text-slate-800 placeholder-slate-400"
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-slate-600">Description</label>
+                <label className="mb-1.5 block text-xs font-bold uppercase tracking-wider text-slate-400">Description</label>
                 <textarea
-                  rows={3}
+                  rows={2}
                   value={newAuditDescription}
                   onChange={(e) => setNewAuditDescription(e.target.value)}
                   placeholder="Audit procedures summary..."
-                  className="block w-full rounded-md border border-slate-200 bg-slate-50 mt-1 py-2.5 px-3 text-sm text-slate-800 focus:outline-[#2E7D32]"
+                  className="w-full rounded-xl border border-slate-200 px-3.5 py-2.5 text-sm focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/10 focus:outline-none transition-all outline-none font-medium text-slate-800 placeholder-slate-400"
                 />
               </div>
-              <div className="pt-4 border-t border-slate-100 flex justify-end gap-3">
-                <button
-                  type="button"
-                  onClick={() => setShowCreateAudit(false)}
-                  className="rounded-md border border-slate-200 px-4 py-2.5 text-sm font-semibold text-slate-500 hover:bg-slate-50"
-                >
-                  Cancel
-                </button>
-                <button
-                  type="submit"
-                  className="rounded-md bg-[#2E7D32] px-5 py-2.5 text-sm font-semibold text-white hover:bg-[#1B5E20]"
-                >
-                  Schedule Audit
-                </button>
-              </div>
+              <button
+                type="submit"
+                className="w-full rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 py-3 text-sm font-bold text-white hover:from-emerald-700 hover:to-teal-700 transition-all cursor-pointer shadow-md shadow-emerald-500/10"
+              >
+                Schedule Audit
+              </button>
             </form>
           </div>
         </div>
@@ -1033,28 +1045,39 @@ const Governance: React.FC = () => {
 
       {/* REPORT COMPLIANCE ISSUE DIALOG */}
       {showReportIssue && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/40 p-4 backdrop-blur-xs">
-          <div className="w-full max-w-lg bg-white rounded-lg shadow-soft border border-slate-200 p-8">
-            <h3 className="text-lg font-bold text-slate-800 mb-4">Report Governance Incident</h3>
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/45 p-4 backdrop-blur-sm">
+          <div className="w-full max-w-lg bg-white rounded-2xl shadow-lg border border-slate-100 p-6 relative">
+            <div className="absolute top-0 left-0 w-full h-[4px] bg-gradient-to-r from-emerald-500 to-teal-500" />
+            <div className="mb-6 flex items-center justify-between">
+              <h3 className="text-lg font-bold text-slate-800 flex items-center gap-1.5">
+                <AlertTriangle size={18} className="text-rose-500" /> Report Incident
+              </h3>
+              <button
+                onClick={() => setShowReportIssue(false)}
+                className="text-slate-400 hover:text-slate-600 p-1 hover:bg-slate-50 rounded-full transition-colors cursor-pointer"
+              >
+                <X size={18} />
+              </button>
+            </div>
             <form onSubmit={handleReportIssue} className="space-y-4">
               <div>
-                <label className="block text-sm font-medium text-slate-600">Incident Subject</label>
+                <label className="mb-1.5 block text-xs font-bold uppercase tracking-wider text-slate-400">Incident Subject</label>
                 <input
                   type="text"
                   required
                   value={newIssueTitle}
                   onChange={(e) => setNewIssueTitle(e.target.value)}
-                  placeholder="e.g. Non-compliant waste disposal in building B"
-                  className="block w-full rounded-md border border-slate-200 bg-slate-50 mt-1 py-2.5 px-3 text-sm text-slate-800 focus:outline-[#2E7D32]"
+                  placeholder="e.g. Non-compliant waste disposal"
+                  className="w-full rounded-xl border border-slate-200 px-3.5 py-2.5 text-sm focus:border-rose-500 focus:ring-2 focus:ring-rose-500/10 focus:outline-none transition-all outline-none font-medium text-slate-800 placeholder-slate-400"
                 />
               </div>
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-sm font-medium text-slate-600">Severity</label>
+                  <label className="mb-1.5 block text-xs font-bold uppercase tracking-wider text-slate-400">Severity</label>
                   <select
                     value={newIssueSeverity}
                     onChange={(e) => setNewIssueSeverity(e.target.value)}
-                    className="block w-full rounded-md border border-slate-200 bg-slate-50 mt-1 py-2.5 px-3 text-sm text-slate-800 focus:outline-[#2E7D32]"
+                    className="w-full rounded-xl border border-slate-200 px-3.5 py-2.5 text-sm focus:border-rose-500 focus:ring-2 focus:ring-rose-500/10 focus:outline-none transition-all outline-none font-medium bg-white"
                   >
                     <option value="Low">Low</option>
                     <option value="Medium">Medium</option>
@@ -1063,11 +1086,11 @@ const Governance: React.FC = () => {
                   </select>
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-slate-600">Linked Policy (Optional)</label>
+                  <label className="mb-1.5 block text-xs font-bold uppercase tracking-wider text-slate-400">Linked Policy (Optional)</label>
                   <select
                     value={newIssuePolicyId}
                     onChange={(e) => setNewIssuePolicyId(e.target.value)}
-                    className="block w-full rounded-md border border-slate-200 bg-slate-50 mt-1 py-2.5 px-3 text-sm text-slate-800 focus:outline-[#2E7D32]"
+                    className="w-full rounded-xl border border-slate-200 px-3.5 py-2.5 text-sm focus:border-rose-500 focus:ring-2 focus:ring-rose-500/10 focus:outline-none transition-all outline-none font-medium bg-white"
                   >
                     <option value="">None</option>
                     {policies.map(p => (
@@ -1077,31 +1100,22 @@ const Governance: React.FC = () => {
                 </div>
               </div>
               <div>
-                <label className="block text-sm font-medium text-slate-600">Describe Incident details</label>
+                <label className="mb-1.5 block text-xs font-bold uppercase tracking-wider text-slate-400">Describe Details</label>
                 <textarea
                   rows={4}
                   required
                   value={newIssueDescription}
                   onChange={(e) => setNewIssueDescription(e.target.value)}
                   placeholder="Include dates, department areas, and details..."
-                  className="block w-full rounded-md border border-slate-200 bg-slate-50 mt-1 py-2.5 px-3 text-sm text-slate-800 focus:outline-[#2E7D32]"
+                  className="w-full rounded-xl border border-slate-200 px-3.5 py-2.5 text-sm focus:border-rose-500 focus:ring-2 focus:ring-rose-500/10 focus:outline-none transition-all outline-none font-medium text-slate-800 placeholder-slate-400"
                 />
               </div>
-              <div className="pt-4 border-t border-slate-100 flex justify-end gap-3">
-                <button
-                  type="button"
-                  onClick={() => setShowReportIssue(false)}
-                  className="rounded-md border border-slate-200 px-4 py-2.5 text-sm font-semibold text-slate-500 hover:bg-slate-50"
-                >
-                  Cancel
-                </button>
-                <button
-                  type="submit"
-                  className="rounded-md bg-red-600 px-5 py-2.5 text-sm font-semibold text-white hover:bg-red-700"
-                >
-                  Submit Case
-                </button>
-              </div>
+              <button
+                type="submit"
+                className="w-full rounded-xl bg-gradient-to-r from-rose-600 to-red-600 py-3 text-sm font-bold text-white hover:from-rose-700 hover:to-red-700 transition-all cursor-pointer shadow-md shadow-rose-500/10"
+              >
+                Submit Incident Case
+              </button>
             </form>
           </div>
         </div>
@@ -1109,48 +1123,59 @@ const Governance: React.FC = () => {
 
       {/* REGISTER RISK DIALOG */}
       {showCreateRisk && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/40 p-4 backdrop-blur-xs">
-          <div className="w-full max-w-lg bg-white rounded-lg shadow-soft border border-slate-200 p-8">
-            <h3 className="text-lg font-bold text-slate-800 mb-4">Register Risk Entry</h3>
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/45 p-4 backdrop-blur-sm">
+          <div className="w-full max-w-lg bg-white rounded-2xl shadow-lg border border-slate-100 p-6 relative">
+            <div className="absolute top-0 left-0 w-full h-[4px] bg-gradient-to-r from-emerald-500 to-teal-500" />
+            <div className="mb-6 flex items-center justify-between">
+              <h3 className="text-lg font-bold text-slate-800 flex items-center gap-1.5">
+                <Sparkles size={16} className="text-emerald-500" /> Register Risk Entry
+              </h3>
+              <button
+                onClick={() => setShowCreateRisk(false)}
+                className="text-slate-400 hover:text-slate-600 p-1 hover:bg-slate-50 rounded-full transition-colors cursor-pointer"
+              >
+                <X size={18} />
+              </button>
+            </div>
             <form onSubmit={handleCreateRisk} className="space-y-4">
               <div>
-                <label className="block text-sm font-medium text-slate-600">Risk Title</label>
+                <label className="mb-1.5 block text-xs font-bold uppercase tracking-wider text-slate-400">Risk Title</label>
                 <input
                   type="text"
                   required
                   value={newRiskTitle}
                   onChange={(e) => setNewRiskTitle(e.target.value)}
                   placeholder="e.g. Regulatory changes in carbon taxation"
-                  className="block w-full rounded-md border border-slate-200 bg-slate-50 mt-1 py-2.5 px-3 text-sm text-slate-800 focus:outline-[#2E7D32]"
+                  className="w-full rounded-xl border border-slate-200 px-3.5 py-2.5 text-sm focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/10 focus:outline-none transition-all outline-none font-medium text-slate-800 placeholder-slate-400"
                 />
               </div>
-              <div className="grid grid-cols-3 gap-4">
+              <div className="grid grid-cols-3 gap-3">
                 <div>
-                  <label className="block text-sm font-medium text-slate-600">Likelihood (1-5)</label>
+                  <label className="mb-1.5 block text-xs font-bold uppercase tracking-wider text-slate-400">Likelihood (1-5)</label>
                   <select
                     value={newRiskLikelihood}
                     onChange={(e) => setNewRiskLikelihood(Number(e.target.value))}
-                    className="block w-full rounded-md border border-slate-200 bg-slate-50 mt-1 py-2.5 px-3 text-sm text-slate-800 focus:outline-[#2E7D32]"
+                    className="w-full rounded-xl border border-slate-200 px-3.5 py-2.5 text-sm focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/10 focus:outline-none transition-all outline-none font-medium bg-white"
                   >
                     {[1, 2, 3, 4, 5].map(n => <option key={n} value={n}>{n}</option>)}
                   </select>
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-slate-600">Impact (1-5)</label>
+                  <label className="mb-1.5 block text-xs font-bold uppercase tracking-wider text-slate-400">Impact (1-5)</label>
                   <select
                     value={newRiskImpact}
                     onChange={(e) => setNewRiskImpact(Number(e.target.value))}
-                    className="block w-full rounded-md border border-slate-200 bg-slate-50 mt-1 py-2.5 px-3 text-sm text-slate-800 focus:outline-[#2E7D32]"
+                    className="w-full rounded-xl border border-slate-200 px-3.5 py-2.5 text-sm focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/10 focus:outline-none transition-all outline-none font-medium bg-white"
                   >
                     {[1, 2, 3, 4, 5].map(n => <option key={n} value={n}>{n}</option>)}
                   </select>
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-slate-600">Department</label>
+                  <label className="mb-1.5 block text-xs font-bold uppercase tracking-wider text-slate-400">Department</label>
                   <select
                     value={newRiskDeptId}
                     onChange={(e) => setNewRiskDeptId(e.target.value)}
-                    className="block w-full rounded-md border border-slate-200 bg-slate-50 mt-1 py-2.5 px-3 text-sm text-slate-800 focus:outline-[#2E7D32]"
+                    className="w-full rounded-xl border border-slate-200 px-3.5 py-2.5 text-sm focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/10 focus:outline-none transition-all outline-none font-medium bg-white"
                   >
                     <option value="">None (Global)</option>
                     {departments.map(d => (
@@ -1160,40 +1185,31 @@ const Governance: React.FC = () => {
                 </div>
               </div>
               <div>
-                <label className="block text-sm font-medium text-slate-600">Description</label>
+                <label className="mb-1.5 block text-xs font-bold uppercase tracking-wider text-slate-400">Description</label>
                 <textarea
                   rows={2}
                   value={newRiskDescription}
                   onChange={(e) => setNewRiskDescription(e.target.value)}
                   placeholder="Explain the source and details of this threat..."
-                  className="block w-full rounded-md border border-slate-200 bg-slate-50 mt-1 py-2.5 px-3 text-sm text-slate-800 focus:outline-[#2E7D32]"
+                  className="w-full rounded-xl border border-slate-200 px-3.5 py-2.5 text-sm focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/10 focus:outline-none transition-all outline-none font-medium text-slate-800 placeholder-slate-400"
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-slate-600">Mitigation Strategy</label>
+                <label className="mb-1.5 block text-xs font-bold uppercase tracking-wider text-slate-400">Mitigation Strategy</label>
                 <textarea
-                  rows={3}
+                  rows={2}
                   value={newRiskMitigation}
                   onChange={(e) => setNewRiskMitigation(e.target.value)}
-                  placeholder="Specific actions to mitigate the risk..."
-                  className="block w-full rounded-md border border-slate-200 bg-slate-50 mt-1 py-2.5 px-3 text-sm text-slate-800 focus:outline-[#2E7D32]"
+                  placeholder="Mitigation mapping actions..."
+                  className="w-full rounded-xl border border-slate-200 px-3.5 py-2.5 text-sm focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/10 focus:outline-none transition-all outline-none font-medium text-slate-800 placeholder-slate-400"
                 />
               </div>
-              <div className="pt-4 border-t border-slate-100 flex justify-end gap-3">
-                <button
-                  type="button"
-                  onClick={() => setShowCreateRisk(false)}
-                  className="rounded-md border border-slate-200 px-4 py-2.5 text-sm font-semibold text-slate-500 hover:bg-slate-50"
-                >
-                  Cancel
-                </button>
-                <button
-                  type="submit"
-                  className="rounded-md bg-[#2E7D32] px-5 py-2.5 text-sm font-semibold text-white hover:bg-[#1B5E20]"
-                >
-                  Register Risk
-                </button>
-              </div>
+              <button
+                type="submit"
+                className="w-full rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 py-3 text-sm font-bold text-white hover:from-emerald-700 hover:to-teal-700 transition-all cursor-pointer shadow-md shadow-emerald-500/10"
+              >
+                Register Risk Entry
+              </button>
             </form>
           </div>
         </div>

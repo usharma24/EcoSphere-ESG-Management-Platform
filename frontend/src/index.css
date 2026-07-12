@@ -1,19 +1,20 @@
 @import "tailwindcss";
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Inter:wght@300;400;500;600;700&display=swap');
 
 @theme {
-  --color-primary: #2E7D32;
-  --color-primary-light: #E8F5E9;
-  --color-primary-dark: #1B5E20;
+  --color-primary: #059669;
+  --color-primary-light: #ecfdf5;
+  --color-primary-dark: #047857;
   
-  --color-secondary: #43A047;
-  --color-secondary-light: #C8E6C9;
-  --color-secondary-dark: #2E7D32;
+  --color-secondary: #0d9488;
+  --color-secondary-light: #f0fdfa;
+  --color-secondary-dark: #0f766e;
 
-  --color-background: #F7F9FC;
-  --color-card: #FFFFFF;
+  --color-background: #f8fafc;
+  --color-card: #ffffff;
 
-  --shadow-soft: 0 4px 20px -2px rgba(0, 0, 0, 0.05), 0 2px 8px -1px rgba(0, 0, 0, 0.03);
+  --shadow-soft: 0 10px 30px -10px rgba(15, 23, 42, 0.04), 0 1px 3px -1px rgba(15, 23, 42, 0.02);
+  --shadow-premium: 0 20px 40px -15px rgba(5, 150, 105, 0.05), 0 1px 10px -2px rgba(5, 150, 105, 0.02);
 
   --radius-lg: 16px;
   --radius-md: 12px;
@@ -22,18 +23,71 @@
 
 body {
   margin: 0;
-  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+  font-family: 'Plus Jakarta Sans', 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
     'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
     sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  background-color: #F7F9FC;
-  color: #1E293B;
+  background-color: #f8fafc;
+  color: #0f172a;
 }
 
 code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
     monospace;
+}
+
+/* Glassmorphism Surface styling */
+.glass-card {
+  background: rgba(255, 255, 255, 0.65);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.5);
+  box-shadow: 0 8px 32px 0 rgba(15, 23, 42, 0.03);
+}
+
+.glass-card-hover {
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.glass-card-hover:hover {
+  transform: translateY(-2px);
+  background: rgba(255, 255, 255, 0.8);
+  border-color: rgba(5, 150, 105, 0.2);
+  box-shadow: 0 12px 30px 0 rgba(5, 150, 105, 0.06);
+}
+
+/* Active navigation gradients */
+.nav-active-gradient {
+  background: linear-gradient(135deg, rgba(5, 150, 105, 0.08) 0%, rgba(13, 148, 136, 0.08) 100%);
+  border-left: 3px solid #059669;
+}
+
+/* Reusable gradient background helper */
+.brand-gradient {
+  background: linear-gradient(135deg, #059669 0%, #0d9488 100%);
+}
+
+.brand-gradient-text {
+  background: linear-gradient(135deg, #059669 0%, #0d9488 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+/* Shimmer Loading Skeleton */
+@keyframes shimmer {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
+
+.shimmer-skeleton {
+  background: linear-gradient(90deg, #f1f5f9 25%, #e2e8f0 37%, #f1f5f9 63%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite linear;
 }
 
 /* Custom soft scrollbar */
@@ -47,10 +101,11 @@ code {
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #CBD5E1;
+  background: #cbd5e1;
   border-radius: 4px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #94A3B8;
+  background: #94a3b8;
 }
+

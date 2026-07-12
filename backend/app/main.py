@@ -1,7 +1,7 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from app.database.session import engine, Base
-from app.api.routers import auth
+from app.api.routers import auth, governance
 
 # Initialize database tables
 Base.metadata.create_all(bind=engine)
@@ -23,6 +23,7 @@ app.add_middleware(
 
 # Include routers
 app.include_router(auth.router)
+app.include_router(governance.router)
 
 @app.get("/")
 def read_root():

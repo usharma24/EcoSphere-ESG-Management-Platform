@@ -1,9 +1,10 @@
 import React from "react";
-import { Routes, Route, Navigate } from "react-router-dom";
+import { Routes, Route, Navigate, Link } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import Login from "../pages/Login";
 import Register from "../pages/Register";
 import ForgotPassword from "../pages/ForgotPassword";
+import Governance from "../pages/Governance";
 
 // Protected Route Guard
 const ProtectedRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
@@ -63,12 +64,20 @@ const DashboardPlaceholder: React.FC = () => {
             </h1>
             <p className="text-slate-500 text-sm">Welcome back, {user?.full_name}</p>
           </div>
-          <button
-            onClick={logout}
-            className="rounded-md bg-red-50 px-4 py-2 text-sm font-semibold text-red-600 hover:bg-red-100 transition-all duration-200"
-          >
-            Logout
-          </button>
+          <div className="flex items-center gap-3">
+            <Link
+              to="/governance"
+              className="rounded-md bg-[#2E7D32] px-4 py-2 text-sm font-semibold text-white hover:bg-[#1B5E20] transition-all duration-200"
+            >
+              Go to Governance
+            </Link>
+            <button
+              onClick={logout}
+              className="rounded-md bg-red-50 px-4 py-2 text-sm font-semibold text-red-600 hover:bg-red-100 transition-all duration-200"
+            >
+              Logout
+            </button>
+          </div>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -111,7 +120,7 @@ const DashboardPlaceholder: React.FC = () => {
         
         <div className="mt-8 border-t border-slate-100 pt-6">
           <p className="text-xs text-slate-400 text-center">
-            Phase 1 Active: Auth, Base Styling & Database Handshake Validated.
+            Phase 4 Active: Governance, Risk Management & Compliance Logs Enabled.
           </p>
         </div>
       </div>
@@ -144,6 +153,14 @@ const AppRoutes: React.FC = () => {
           <PublicRoute>
             <ForgotPassword />
           </PublicRoute>
+        }
+      />
+      <Route
+        path="/governance"
+        element={
+          <ProtectedRoute>
+            <Governance />
+          </ProtectedRoute>
         }
       />
       <Route
